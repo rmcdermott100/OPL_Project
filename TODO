@@ -1,7 +1,7 @@
-(HL) Define data structures to represent J0 programs.
-(HL) Write a pretty-printer for J0 programs.
-(HL) Write a test-suite of a dozen J0 programs.
-(HL) Implement a big-step interpreter for J0.
+(HL) Define data structures to represent J0 programs. (COMPLETED)
+(HL) Write a pretty-printer for J0 programs. (COMPLETED)
+(HL) Write a test-suite of a dozen J0 programs.(COMPLETED)
+(HL) Implement a big-step interpreter for J0.(COMPLETED)
 (HL) Define a data structure to represent Sexprs.
 (HL) Convert your J0 test-suite into Sexprs.
 (HL) Implement a desugar function that converts Sexprs into J0.
