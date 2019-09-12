@@ -38,6 +38,33 @@ class JMult(J0e):
     def interp(self):
         return self.left.interp() * self.right.interp()
     
+class Se(object):
+    None
+
+class Sep(Se): 
+    
+    left = None
+    Right = None
+    
+    def __init__(self, l, r):
+        self.left = l
+        self.right = r
+    
+    
+
+def d(se):
+    None 
+    
+
+def length(se):
+    if se.right == None:
+        return 0
+    elif se.right != None:
+        return 1 + length(se.right)
+
+def islist():
+    None
+
 
 def pretty_printer_test_suite():
     print(JNum(5).pp())
@@ -60,11 +87,11 @@ def interp_test_suite():
     print("14 =", JAdd(JNum(5), JNum(9)).interp())
     print("19 =", JAdd(JNum(7), JMult(JNum(2), JNum(6))).interp())
 
-
-
+def se_test_suite():
+    print(Sep("a",Sep("b",Sep("c",None).left).right).right)
+    
 if __name__ == "__main__":
-    pretty_printer_test_suite()
-    interp_test_suite()
+   se_test_suite() 
 
 
 
