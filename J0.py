@@ -41,8 +41,7 @@ class JMult(J0e):
 class Se(object):
     None
 
-class Sep(Se): 
-    
+class Sep(Se):  
     left = None
     Right = None
     
@@ -53,18 +52,65 @@ class Sep(Se):
     
 
 def d(se):
-    None 
+
+    if type(se) is str:
+        return JNum(se)
+
+    if islist(se) and length(se) == 2 and first(se) == "-":
+        return JMult(JNum(-1), JNum(second(se)))
+
+    elif islist(se) and length(se) == 3 and first(se) == '-':
+        return JAdd(d(second(se)), d(Sep("-", (Sep(third(se), None)))))
     
+    elif islist(se) and length(se) == 1 and first(se) == "+":
+        return JNum(0)
+
+    elif islist(se) and first(se) == "+":
+        return JAdd(d(second(se)), d(Sep("+", se.right.right)))#the none might have to be changed
+
+
 
 def length(se):
-    if se.right == None:
-        return 0
-    elif se.right != None:
+    
+    if isNull(se.right):
+        return 1
+    elif not isNull(se.right):
         return 1 + length(se.right)
 
-def islist():
-    None
+def first(se):
+    return se.left
 
+def second(se):
+    if not isNull(se.right):
+        return se.right.left
+    else:
+        print("Second function failed")
+        exit()
+
+def third(se):
+    return se.right.right.left
+
+def islist(se):
+    if isNull(se):
+        return True
+    elif isCons(se):
+        return islist(se.right)
+    else:
+        return False
+
+def isCons(se):
+    #if se == '-' or se == '+' or se == '*' or se == '/':
+    if se.left != None:
+        return True
+    else:
+        return False
+
+
+def isNull(se):
+    if se == None:
+        return True
+    else:
+        return False
 
 def pretty_printer_test_suite():
     print(JNum(5).pp())
@@ -91,19 +137,9 @@ def se_test_suite():
     print(Sep("a",Sep("b",Sep("c",None).left).right).right)
     
 if __name__ == "__main__":
-   se_test_suite() 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #se_test_suite()
+    
+    print(d(Sep("+", Sep("3", Sep("1", Sep("2", None))))).interp())
+    
 
 
