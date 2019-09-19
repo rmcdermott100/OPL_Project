@@ -1,7 +1,69 @@
-class J0e(object):
-   None 
+class J1e(object):
+   None
 
-class JNum(J0e):
+class JNull(J1e):
+    x = None
+
+    def pp(self):
+        print("None")
+
+class JCons(J1e):
+
+    left = None
+    right = None
+
+    def __init__(self, l, r):
+        self.left = l
+        self.right = r
+
+    def pp(self):
+        print(type(self.left.pp()))
+        print(type(self.right.pp()))
+        return "(" + self.left.pp() + self.right.pp() + ")"
+
+class JPrim(J1e):
+    p = None
+
+    def __init__(self, prim):
+        self.p = prim
+
+    def pp(self):
+        return self.p
+
+class JBool(J1e):
+    b = None
+
+    def __init__(self, boolean):
+        self.b = boolean
+
+    def pp(self):
+        return self.b
+
+class JIf(J1e):
+    cond = None
+    tbr = None
+    fbr = None
+
+    def __init__(self, c, t, f):
+        self.cond = c
+        self.tbr = t
+        self.fbr = f
+
+    def pp(self):
+        return "if" + self.cond.pp() + self.tbr.pp() + self.fbr.pp()
+
+class JApp(J1e):
+    fun = None
+    args = None
+
+    def __init__(self, f, a):
+        self.fun = f
+        self.args = a
+
+    def pp(self):
+        return "@" + self.fun.pp() + self.args.pp()
+
+class JNum(J1e):
     n = None
     def __init__(self, num):
         self.n = num
@@ -12,32 +74,6 @@ class JNum(J0e):
     def interp(self):
         return int(self.n)
 
-class JAdd(J0e):
-    left = None
-    right = None
-    def __init__(self, l,r):
-        self.left = l
-        self.right = r
-
-    def pp(self):
-        return "(" + self.left.pp() + " + " + self.right.pp() + ")" 
-
-    def interp(self):
-        return self.left.interp() + self.right.interp()
-
-class JMult(J0e):
-    left = None
-    right = None
-    def __init__(self, l,r):
-        self.left = l
-        self.right = r
-
-    def pp(self):
-        return "(" + self.left.pp() + " * " + self.right.pp() + ")"
-
-    def interp(self):
-        return self.left.interp() * self.right.interp()
-    
 class Se(object):
     None
 
@@ -48,8 +84,17 @@ class Sep(Se):
     def __init__(self, l, r):
         self.left = l
         self.right = r
-    
-    
+
+class Sestr(Se):
+    s = None
+    def __init__(self, s):
+        self.s = str(s)
+
+class Semt(Se):
+    None
+
+
+
 
 def d(se):
 
@@ -57,16 +102,20 @@ def d(se):
         return JNum(se)
 
     if islist(se) and length(se) == 2 and first(se) == "-":
-        return JMult(JNum(-1), JNum(second(se)))
+        None
+        #return JMult(JNum(-1), JNum(second(se)))
 
     elif islist(se) and length(se) == 3 and first(se) == '-':
-        return JAdd(d(second(se)), d(Sep("-", (Sep(third(se), None)))))
+        None
+        #return JAdd(d(second(se)), d(Sep("-", (Sep(third(se), None)))))
     
     elif islist(se) and length(se) == 1 and first(se) == "+":
-        return JNum(0)
+        None
+        #return JNum(0)
 
     elif islist(se) and first(se) == "+":
-        return JAdd(d(second(se)), d(Sep("+", se.right.right)))#the none might have to be changed
+        None
+        #return JAdd(d(second(se)), d(Sep("+", se.right.right)))#the none might have to be changed
 
 
 
@@ -100,7 +149,7 @@ def islist(se):
 
 def isCons(se):
     #if se == '-' or se == '+' or se == '*' or se == '/':
-    if se.left != None:
+    if type(se) is Sep:
         return True
     else:
         return False
@@ -112,34 +161,14 @@ def isNull(se):
     else:
         return False
 
-def pretty_printer_test_suite():
-    print(JNum(5).pp())
-    print(JAdd(JNum(5), JNum(6)).pp())
-    print(JMult(JNum(5), JNum(6)).pp())
-    print(JNum(57).pp())
-    print(JAdd(JNum(9), JNum(10)).pp())
-    print(JMult(JNum(8), JNum(15)).pp())
-    print(JAdd(JNum(5), JMult(JNum(5), JNum(7))).pp())
-    print(JAdd(JNum(8), JMult(JNum(9), JNum(10))).pp())
-    print(JAdd(JNum(5), JMult(JNum(5), JMult(JNum(3), JNum(7)))).pp())
-    print(JMult(JNum(4), JMult(JNum(5), JNum(6))).pp())
-    print(JAdd(JNum(77), JAdd(JNum(1), JNum(7))).pp())
-    print(JMult(JNum(100), JMult(JNum(5), JNum(7))).pp())
 
 
-def interp_test_suite():
-    print("5 =", JNum(5).interp())
-    print("15 =", JMult(JNum(3), JNum(5)).interp())
-    print("14 =", JAdd(JNum(5), JNum(9)).interp())
-    print("19 =", JAdd(JNum(7), JMult(JNum(2), JNum(6))).interp())
 
-def se_test_suite():
-    print(Sep("a",Sep("b",Sep("c",None).left).right).right)
+def test():
+    print(JCons(JPrim("-"), JNum("5")).pp())
     
 if __name__ == "__main__":
-    #se_test_suite()
-    
-    print(d(Sep("+", Sep("3", Sep("1", Sep("2", None))))).interp())
+    test()
     
 
 
