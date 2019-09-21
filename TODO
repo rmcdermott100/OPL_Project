@@ -7,12 +7,12 @@
 (HL) Implement a desugar function that converts Sexprs into J0. (COMPLETED)
 (HL) Define data structures to represent J1 programs, with pretty printers.(COMPLETED)
 (HL) Write a test-suite of a dozen J1 programs.(COMPLETED)
-(HL) Extend desugar to emit J1 programs.
+(HL) Extend desugar to emit J1 programs. (COMPLETED)
 (HL) Extend your interpreter for J1. (COMPLETED)
 (HL) Define data structures to represent contexts.
 (HL) Implement plug, a function that fills the hole in a context with a program.
 (HL) Implement find-redex, a function that breaks a term into a context and a redex.
-(HL) Implement a small-step interpreter for J1 using contexts.
+(HL) Implement a small-step interpreter for J1 using contexts. (try to get to here by end of sunday)
 (HL) Refine your definition of contexts to only allow evaluation contexts.
 (HL) Refine find-redex so that it looks for evaluation contexts.
 (HL) Implement the CC0 machine interpreter for J1.

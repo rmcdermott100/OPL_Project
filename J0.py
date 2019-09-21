@@ -131,33 +131,67 @@ class Sestr(Se):
     def __init__(self, s):
         self.s = str(s)
 
+class Senum(Se):
+    n = None
+    def __init__(self, n):
+        self.n = int(n)
+
 class Semt(Se):
     None
 
+def JA(l, r):
+    return JApp(JPrim("+"), JCons(l, JCons(r, None)))
 
+def JM(l, r):
+    return JApp(JPrim("*"), JCons(l, JCons(r, None)))
 
-
+# could add a lot to the desugarer but might not be time effiecient
 def desug(se):
 
-    if type(se) is str:
-        return JNum(se)
+    if type(se) is Senum:
+        return JNum(se.n)
 
-    if islist(se) and length(se) == 2 and first(se) == "-":
-        None
-        #return JMult(JNum(-1), JNum(second(se)))
-
-    elif islist(se) and length(se) == 3 and first(se) == '-':
-        None
-        #return JAdd(d(second(se)), d(Sep("-", (Sep(third(se), None)))))
-    
-    elif islist(se) and length(se) == 1 and first(se) == "+":
-        None
-        #return JNum(0)
-
-    elif islist(se) and first(se) == "+":
-        None
-        #return JAdd(d(second(se)), d(Sep("+", se.right.right)))#the none might have to be changed
-
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        se.lhs.s == "+" and \
+        se.right == None:
+        return JNum(0)
+    if type(se) is Sep and \
+        se.left.s == "=" and \
+        type(se.right) is Sep:
+        return JA(desug(se.right.left), desug(Sep(se.left, se.right.right)))
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "*" and \
+        se.right == None :
+        return JNum(1)
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "*" and \
+        type(se.right) is Sep:
+        return JM(desug(se.right.left), Sep(se.left, se.right.right))
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "-" and \
+        type(se.right) is Sep and \
+        se.right.right == None:
+        return JM(JNum(-1), desug(se.right.left))
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        type(se.right) is Sep and \
+        type(se.right.right) is Sep and \
+        se.right.right.right == None:
+        return JApp(JPrim(se.left.s), Sep(desug(se.right.left), Sep(se.right.right.left, None)))
+    if type(se) is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "if" and \
+        type(se.right) is Sep and \
+        type(se.right.right) is Sep and \
+        type(se.right.right.right) is Sep and \
+        se.right.right.right.right == None:
+        return JIf(desug(se.right.left), desug(se.right.right.left), desug(se.right.right.right.left))
+    #if got down to here its bad news
+    return JNum(666)
 
 
 def length(se):
