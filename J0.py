@@ -6,7 +6,8 @@ class JNull(J1e):
 
     def pp(self):
         print("None")
-
+    def interp(self):
+        return None
 class JCons(J1e):
 
     left = None
@@ -21,6 +22,9 @@ class JCons(J1e):
         print(type(self.right.pp()))
         return "(" + self.left.pp() + self.right.pp() + ")"
 
+    def interp(self):
+        return JCons(self.left.interp(), self.right.interp())
+
 class JPrim(J1e):
     p = None
 
@@ -30,6 +34,9 @@ class JPrim(J1e):
     def pp(self):
         return self.p
 
+    def interp(self):
+        return self.p
+
 class JBool(J1e):
     b = None
 
@@ -37,6 +44,9 @@ class JBool(J1e):
         self.b = boolean
 
     def pp(self):
+        return self.b
+
+    def interp(self):
         return self.b
 
 class JIf(J1e):
@@ -52,6 +62,13 @@ class JIf(J1e):
     def pp(self):
         return "if" + self.cond.pp() + self.tbr.pp() + self.fbr.pp()
 
+    def interp(self):
+        condv = self.cond.interp()
+        if type(condv) is JBool and condv.b == False:
+            return self.fbr.interp()
+        else:
+            return self.tbr.interp()
+
 class JApp(J1e):
     fun = None
     args = None
@@ -62,6 +79,30 @@ class JApp(J1e):
 
     def pp(self):
         return "@" + self.fun.pp() + self.args.pp()
+
+    def interp(self):
+        which_fun = self.fun.interp()
+        arg_vals = self.arg.interp()
+
+        if type(which_fun) is JPrim:
+            p = which_fun.p
+        else:
+            print("error in JApp interp, fun p =" + which_fun)
+            exit(1)
+        lhs = arg_vals.lhs.p
+        rhs = arg_vals.rhs.lhs.p
+
+        if p == "+": return JNum(lhs + rhs)
+        if p == "*": return JNum(lhs * rhs)
+        if p == "/": return JNum(lhs / rhs)
+        if p == "-": return JNum(lhs - rhs)
+        if p == "<": return JBool(lhs < rhs)
+        if p == ">": return JBool(lhs > rhs)
+        if p == "<=": return JBool(lhs <= rhs)
+        if p == ">=": return JBool(lhs >= rhs)
+        if p == "==": return JBool(lhs == rhs)
+        if p == "!=": return JBool(lhs != rhs)
+
 
 class JNum(J1e):
     n = None
@@ -96,7 +137,7 @@ class Semt(Se):
 
 
 
-def d(se):
+def desug(se):
 
     if type(se) is str:
         return JNum(se)
