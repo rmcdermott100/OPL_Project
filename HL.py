@@ -153,7 +153,7 @@ class CHole(C):
     h = None
 
     def __init__(self, h):
-        self.h = h
+        self.h = None
 
     def plug(self, x):
         self.h = x
@@ -169,7 +169,7 @@ class CIf0(C):
         self.e3 = e3
 
     def plug(self, x):
-        self.con = x
+        self.con.plug(x)
 
 class CIf1(C):
     e1 = None
@@ -182,7 +182,7 @@ class CIf1(C):
         self.e3 = e3
 
     def plug(self, x):
-        self.con = x
+        self.con.plug(x)
 
 class CIf2(C):
     e1 = None
@@ -195,20 +195,20 @@ class CIf2(C):
         self.e1 = e1
 
     def plug(self, x):
-        self.con = x
+        self.con.plug(x)
 
 class Celist(C):
     #make this a tree/linked list type deal?
     con = None
     exp = None
 
-    def __init__(self, l ,r):
+    def __init__(self, l, r):
         self.con = l
         self.exp = r
 
     def plug(self, x):
         # do not really know how to do this one
-        con = x
+        self.con.plug(x)
 
 
 
