@@ -1,6 +1,9 @@
 class J1e(object):
    None
 
+class C(object):
+    None
+
 class JNull(J1e):
     x = None
 
@@ -144,6 +147,71 @@ def JA(l, r):
 
 def JM(l, r):
     return JApp(JPrim("*"), JCons(l, JCons(r, None)))
+
+
+class CHole(C):
+    h = None
+
+    def __init__(self, h):
+        self.h = h
+
+    def plug(self, x):
+        self.h = x
+
+class CIf0(C):
+    con = None
+    e2 = None
+    e3 = None
+
+    def __init__(self, c, e2, e3):
+        self.con = c
+        self.e2 = e2
+        self.e3 = e3
+
+    def plug(self, x):
+        self.con = x
+
+class CIf1(C):
+    e1 = None
+    con = None
+    e3 = None
+
+    def __init__(self,  e1, c, e3):
+        self.con = c
+        self.e1 = e1
+        self.e3 = e3
+
+    def plug(self, x):
+        self.con = x
+
+class CIf2(C):
+    e1 = None
+    e2 = None
+    con = None
+
+    def __init__(self, e1, e2, c):
+        self.con = c
+        self.e2 = e2
+        self.e1 = e1
+
+    def plug(self, x):
+        self.con = x
+
+class Celist(C):
+    #make this a tree/linked list type deal?
+    con = None
+    exp = None
+
+    def __init__(self, l ,r):
+        self.con = l
+        self.exp = r
+
+    def plug(self, x):
+        # do not really know how to do this one
+        con = x
+
+
+
 
 # could add a lot to the desugarer but might not be time effiecient
 def desug(se):
