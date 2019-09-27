@@ -4,13 +4,17 @@ class J1e(object):
 class C(object):
     None
 
+class E(object):
+    None
+
 class JNull(J1e):
     x = None
 
     def pp(self):
-        print("None")
+        return "x"
     def interp(self):
-        return None
+        return 0
+
 class JCons(J1e):
 
     left = None
@@ -21,8 +25,6 @@ class JCons(J1e):
         self.right = r
 
     def pp(self):
-        print(type(self.left.pp()))
-        print(type(self.right.pp()))
         return "(" + self.left.pp() + self.right.pp() + ")"
 
     def interp(self):
@@ -84,27 +86,38 @@ class JApp(J1e):
         return "@" + self.fun.pp() + self.args.pp()
 
     def interp(self):
-        which_fun = self.fun.interp()
-        arg_vals = self.arg.interp()
+
+        which_fun = self.fun
+        arg_vals = self.args.interp()
 
         if type(which_fun) is JPrim:
-            p = which_fun.p
+            p = which_fun.interp()
         else:
-            print("error in JApp interp, fun p =" + which_fun)
+            print("error in JApp interp, fun p = " + which_fun)
             exit(1)
-        lhs = arg_vals.lhs.p
-        rhs = arg_vals.rhs.lhs.p
 
-        if p == "+": return JNum(lhs + rhs)
-        if p == "*": return JNum(lhs * rhs)
-        if p == "/": return JNum(lhs / rhs)
-        if p == "-": return JNum(lhs - rhs)
-        if p == "<": return JBool(lhs < rhs)
-        if p == ">": return JBool(lhs > rhs)
-        if p == "<=": return JBool(lhs <= rhs)
-        if p == ">=": return JBool(lhs >= rhs)
-        if p == "==": return JBool(lhs == rhs)
-        if p == "!=": return JBool(lhs != rhs)
+        lhs = arg_vals.left
+        rhs = arg_vals.right.left
+        if p == "+":
+            return JNum(lhs + rhs)
+        if p == "*":
+            return JNum(lhs * rhs)
+        if p == "/":
+            return JNum(lhs / rhs)
+        if p == "-":
+            return JNum(lhs - rhs)
+        if p == "<":
+            return JBool(lhs < rhs)
+        if p == ">":
+            return JBool(lhs > rhs)
+        if p == "<=":
+            return JBool(lhs <= rhs)
+        if p == ">=":
+            return JBool(lhs >= rhs)
+        if p == "==":
+            return JBool(lhs == rhs)
+        if p == "!=":
+            return JBool(lhs != rhs)
 
 
 class JNum(J1e):
@@ -149,16 +162,17 @@ def JM(l, r):
     return JApp(JPrim("*"), JCons(l, JCons(r, None)))
 
 
-class CHole(C):
+class EHole(E):
     h = None
 
-    def __init__(self, h):
-        self.h = None
+    def __init__(self):
+        h = None
 
     def plug(self, x):
         self.h = x
 
-class CIf0(C):
+class EIf(E):
+
     con = None
     e2 = None
     e3 = None
@@ -169,35 +183,10 @@ class CIf0(C):
         self.e3 = e3
 
     def plug(self, x):
-        self.con.plug(x)
+        self.con = x
 
-class CIf1(C):
-    e1 = None
-    con = None
-    e3 = None
 
-    def __init__(self,  e1, c, e3):
-        self.con = c
-        self.e1 = e1
-        self.e3 = e3
-
-    def plug(self, x):
-        self.con.plug(x)
-
-class CIf2(C):
-    e1 = None
-    e2 = None
-    con = None
-
-    def __init__(self, e1, e2, c):
-        self.con = c
-        self.e2 = e2
-        self.e1 = e1
-
-    def plug(self, x):
-        self.con.plug(x)
-
-class Celist(C):
+class Elist(E):
     #make this a tree/linked list type deal?
     con = None
     exp = None
@@ -208,12 +197,67 @@ class Celist(C):
 
     def plug(self, x):
         # do not really know how to do this one
-        self.con.plug(x)
+        self.con = x
 
 
 
 
-# could add a lot to the desugarer but might not be time effiecient
+
+# changing the JApp tto CList might fix this
+# but i do not think it will work with nested apps and ifs (fix tomorrow)
+def step(e):
+
+    cp, ep = find_redex(e)
+    if ep == None:
+        return e
+
+    if type(cp) is EHole:
+        cp.plug(ep.interp())
+        e = cp.h
+
+    #turn into CList
+    elif type(cp) is EHole:
+        cp.plug(ep.interp())
+        e = cp.h
+
+    elif type(cp) is EIf:
+        cp.plug(step(ep))
+        e = cp.con
+
+    e = step(e)
+    return e
+
+def find_redex(e):
+
+    if type(e) is JIf:
+        if type(e.cond) is JPrim or type(e.cond) is JNum or type(e.cond) is JBool:
+            return EHole(), e
+        else:
+            cp, ep = find_redex(e.cond)
+            return EIf(cp, e.tbr, e.fbr), ep
+    if type(e) is JApp:
+        # look at the first thing that is not a value
+        if type(e.fun) is JBool or type(e.fun) is JPrim or type(e.fun) is JNum:
+            #retunr CList
+            return EHole(), e
+        else:
+            # go deeper into the JApp???, is that possible?
+            cp, ep = find_redex(e.args)
+    if type(e) is JCons:
+        if type(e.left) is JBool or type(e.left) is JPrim or type(e.left) is JNum:
+            return EHole(), e
+        else:
+            cp, ep = find_redex(e.right)
+
+    if type(e) is JPrim or type(e) is JNum or type(e) is JBool:
+        # do nothing? or failure
+        return None, None
+
+    return None, None
+    # return None on failure? for step function.
+
+
+# could add a lot to the desugarer but might not be time effiecient, especially if it gets changed anyway
 def desug(se):
 
     if type(se) is Senum:
@@ -225,7 +269,7 @@ def desug(se):
         se.right == None:
         return JNum(0)
     if type(se) is Sep and \
-        se.left.s == "=" and \
+        se.left.s == "+" and \
         type(se.right) is Sep:
         return JA(desug(se.right.left), desug(Sep(se.left, se.right.right)))
     if type(se) is Sep and \
@@ -308,10 +352,18 @@ def isNull(se):
 
 
 def test():
-    print(JCons(JPrim("-"), JNum("5")).pp())
-    
+
+    print(step(JApp(JPrim("+"), JCons(JNum(7), JCons(JNum(5), JNull())))))
+    print(JNum(6))
+    print(step(JIf(JNum(7),JNum(5),JNum(0))))
+    print(step(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0))))
+    print(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0)).interp())
+
 if __name__ == "__main__":
     test()
-    
+
+
+
+    #print(step(JCons(JPrim("+"), JCons(JNum(7), JCons(JNum(1), JNull()))).pp()))
 
 
