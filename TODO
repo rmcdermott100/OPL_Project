@@ -14,8 +14,8 @@
 (HL) Implement find-redex, a function that breaks a term into a context and a redex. (COMPLETED)
 (HL) Implement a small-step interpreter for J1 using contexts. (COMPLETED)
 (HL) Refine your definition of contexts to only allow evaluation contexts. (COMPLETED)
-(HL) Refine find-redex so that it looks for evaluation contexts.
-(HL) Implement the CC0 machine interpreter for J1.
+(HL) Refine find-redex so that it looks for evaluation contexts. (COMPLETED)
+(HL) Implement the CC0 machine interpreter for J1. (COMPLETED)
 (LL) Define data structures to represent J1 programs.
 (HL) Write a function that emit HL-J1 programs as LL-J1 programs.
 (LL) Define data structures to represent continuations.

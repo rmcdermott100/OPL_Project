@@ -7,6 +7,7 @@ class C(object):
 class E(object):
     None
 
+
 class JNull(J1e):
     x = None
 
@@ -183,21 +184,23 @@ class EIf(E):
         self.e3 = e3
 
     def plug(self, x):
-        self.con = x
+        self.con = JIf(self.cond.plug(x), self.e2, self.e3)
 
 
 class Elist(E):
     #make this a tree/linked list type deal?
-    con = None
-    exp = None
+    vs = []
+    h = None
+    es = []
 
-    def __init__(self, l, r):
-        self.con = l
-        self.exp = r
+    def __init__(self, l, h, r):
+        self.vs = l
+        self.h = h
+        self.es = r
 
     def plug(self, x):
         # do not really know how to do this one
-        self.con = x
+        self.left = JApp(self.vs, self.h.plug(x), self.es)
 
 
 
@@ -305,41 +308,62 @@ def desug(se):
     #if got down to here its bad news
     return JNum(666)
 
+class st():
 
-def length(se):
-    
-    if isNull(se.right):
-        return 1
-    elif not isNull(se.right):
-        return 1 + length(se.right)
+    e = None
+    E = None
 
-def first(se):
-    return se.left
+    def __init__(self, e, E):
+        self.e = e
+        self.E = E
 
-def second(se):
-    if not isNull(se.right):
-        return se.right.left
-    else:
-        print("Second function failed")
-        exit()
+def inject(e):
 
-def third(se):
-    return se.right.right.left
+    return # e and a hole
 
-def islist(se):
-    if isNull(se):
-        return True
-    elif isCons(se):
-        return islist(se.right)
-    else:
-        return False
+def extract(st):
 
-def isCons(se):
-    #if se == '-' or se == '+' or se == '*' or se == '/':
-    if type(se) is Sep:
-        return True
-    else:
-        return False
+    return # E[e]
+
+def ccstep(st):
+
+    if type(st.e) is JIf:
+        stp = st(st.e.cond, EIf(EHole, st.e.tbr, st.e.fbr))
+        return stp
+
+    if type(st.e) is JBool and st.e.b == "True" and type(st.E) is EIf:
+        stp = st(st.E.tbr, st.E)
+        return stp
+
+    if type(st.e) is JBool and st.e.b == "False" and type(st.E) is EIf:
+        stp = st(st.E.fbr, st.E)
+        return stp
+
+    if type(st.E) is Elist and not st.E.vs:
+        stp = st(st.e.left, Elist([], EHole, st.e.right))
+        return stp
+
+    #last 2 using functions
+    if type(st.e) is JNum or type(st.e) is JBool or type(st.e) is JPrim and type(st.E)is Elist and st.E.es:
+        del(st.E.es[0])
+        stp = st(st.E.es[0], Elist(st.E.vs, EHole, st.E.es))
+        return stp
+
+    if type(st.e) is JNum or type(st.e) is JBool or type(st.e) is JPrim and type(st.E)is Elist and  not st.E.es:
+        stp = (st.E.vs.interp(), E)
+
+#function repoeresting cc machine
+def CC0(e):
+
+    while 1:
+        st = ccstep(e)
+        if type(st.e) is JPrim or type(st.e) is JBool or type(st.e) is JNum and type(st.E) is EHole:
+            break
+        st.E.plug(e)
+
+    return st.e
+    # done when i have a value and a hole
+
 
 
 def isNull(se):
