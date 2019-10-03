@@ -16,7 +16,7 @@
 (HL) Refine your definition of contexts to only allow evaluation contexts. (COMPLETED)
 (HL) Refine find-redex so that it looks for evaluation contexts. (COMPLETED)
 (HL) Implement the CC0 machine interpreter for J1. (COMPLETED)
-(LL) Define data structures to represent J1 programs.
+(LL) Define data structures to represent J1 programs. (COMPLETED)
 (HL) Write a function that emit HL-J1 programs as LL-J1 programs.
 (LL) Define data structures to represent continuations.
 (LL) Implement the CK0 machine interpreter for J1.
