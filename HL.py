@@ -383,9 +383,21 @@ def test():
     print(step(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0))))
     print(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0)).interp())
 
-if __name__ == "__main__":
-    test()
 
+def emit_LL():
+    f = open("x.c", "w")
+    f.write("#include <stdio.h> \n\n")
+    f.write("int main(int argc, char * argv[]) {\n")
+    f.write("\tJNum x = {.n = 5}; \n")
+    f.write("\tprintf(\"%d\", x.n);\n")
+    f.write("\treturn 0;\n")
+    f.write("}")
+    f.close()
+
+
+if __name__ == "__main__":
+    #test()
+    emit_LL()
 
 
     #print(step(JCons(JPrim("+"), JCons(JNum(7), JCons(JNum(1), JNull()))).pp()))
