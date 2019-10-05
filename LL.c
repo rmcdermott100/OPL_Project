@@ -1,74 +1,36 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include "LL.h"
 
-typedef enum {
-    JNULL,
-    JIF,
-    JNUM,
-    JAPP,
-    JBOOL,
-    JPRIM,
-    KRET,
-    KIF,
-    KAPP,
-    JCONS,
-} Tag ;
 
-typedef struct {
-    enum Tag tag;
-} expr;
-
-typedef struct {
-    expr head;
-    int n;
-
-} JNum;
 
 expr* make_JNum(int number) {
 
 	JNum* p = malloc(sizeof(JNum));
 	p->head.tag = JNUM;
 	p->n = number;
-	return p;
+	return (expr*)p;
 
 }
-
-typedef struct{
-    expr head;
-    bool b;
-
-} JBool;
 
 expr* make_JBool(bool boolean) {
 
 	JBool* p = malloc(sizeof(JBool));
 	p->head.tag = JBOOL;
 	p->b = boolean;
-	return p;
+	return (expr*)p;
 
 }
-
-typedef struct{
-    expr head;
-	char p;
-
-} JPrim;
 
 expr* make_JPrim(char prim) {
 
 	JPrim* p = malloc(sizeof(JPrim));
 	p->head.tag = JPRIM;
 	p->p = prim;
-	return p;
+	return (expr*)p;
 
 }
 
-typedef struct{
-
-    expr head;
-    expr *c, *t, *f;
-
-} JIf;
 
 expr* make_JIf(expr* c, expr* t, expr * f) {
 
@@ -77,17 +39,10 @@ expr* make_JIf(expr* c, expr* t, expr * f) {
 	p->c = c;
 	p->t = t;
 	p->f = f;
-	return p;
+	return (expr*)p;
 
 }
 
-typedef struct{
-
-    expr head;
-	expr* func;
-	expr* args;
-
-} JApp;
 
 expr* make_JApp(expr* func, expr* args) {
 
@@ -95,6 +50,43 @@ expr* make_JApp(expr* func, expr* args) {
 	p->head.tag = JAPP;
 	p->func = func;
 	p->args = args;
-	return p;
+	return (expr*)p;
 
 }
+
+expr* make_KRet(expr* r){
+
+    KRet *p = malloc(sizeof(KRet));
+    p->head.tag = KRET;
+    p->ret = r;
+    return (expr*)p;
+}
+
+expr* make_KIf(expr* c, expr* t, expr* f){
+
+    KIf *p = malloc(sizeof(KIf));
+    p->head.tag = KIF;
+    p->t = t;
+    p->f = f;
+    p->c = c;
+    return (expr*)p;
+
+}
+
+expr* make_KApp(expr* es, expr* vs, expr* k){
+
+    KApp *p = malloc(sizeof(KApp));
+    p->es = es;
+    p->vs = vs;
+    p->k = k;
+    return (expr*)p;
+
+}
+
+
+
+
+
+
+
+
