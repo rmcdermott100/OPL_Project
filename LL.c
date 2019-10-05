@@ -54,7 +54,7 @@ expr* make_JApp(expr* func, expr* args) {
 
 }
 
-expr* make_KRet(expr* r){
+expr* make_KRet(expr r){
 
     KRet *p = malloc(sizeof(KRet));
     p->head.tag = KRET;

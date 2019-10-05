@@ -92,6 +92,6 @@ typedef struct{
     expr head;
     expr *vs;
     expr *es;
-    expr k;
+    expr *k;
 
 }KApp;
