@@ -107,7 +107,7 @@ void eval(expr* oc){
                 break;
             }
             case JAPP:{
-                JApp * c = (JApp*)oc;
+                JApp *c = (JApp*)oc;
                 oc = c->func;
                 ok = make_KApp(NULL, make_JNull(), oe, c->args, ok);
                 break;
