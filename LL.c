@@ -3,6 +3,15 @@
 #include "LL.h"
 
 
+// make Vcons and econs linked lists for the KApp structure?
+
+expr* make_JNull(){
+
+    JNull* p = malloc(sizeof(JNull));
+    p->head.tag = JNULL;
+    return p;
+
+}
 
 expr* make_JNum(int number) {
 
@@ -54,11 +63,10 @@ expr* make_JApp(expr* func, expr* args) {
 
 }
 
-expr* make_KRet(expr r){
+expr* make_KRet(){
 
     KRet *p = malloc(sizeof(KRet));
     p->head.tag = KRET;
-    p->ret = r;
     return (expr*)p;
 }
 
@@ -73,9 +81,10 @@ expr* make_KIf(expr* c, expr* t, expr* f){
 
 }
 
-expr* make_KApp(expr* es, expr* vs, expr* k){
+expr* make_KApp(expr rator, expr* es, expr* vs, expr* k){
 
     KApp *p = malloc(sizeof(KApp));
+    p-> rator = rator;
     p->es = es;
     p->vs = vs;
     p->k = k;
@@ -84,6 +93,62 @@ expr* make_KApp(expr* es, expr* vs, expr* k){
 }
 
 
+void eval(expr* oc){
+    expr* oe = make_JNull();
+    expr* ok = make_KRet();
+    // does this insert and extract?
+    while(1){
+        switch(find_tag(oc)){
+            // each case updates e and k, the old k gets remembered
+            case JIF:{
+                JIf * c = (JIf *)oc;
+                oc = c->c;
+                ok = make_KIf(oe, c->t, c->f, ok);
+                break;
+            }
+            case JAPP:{
+                JApp * c = (JApp*)oc;
+                oc = c->func;
+                ok = make_KApp(NULL, make_JNull(), oe, c->args, ok);
+                break;
+                }
+            case JNUM:
+            case JPRIM:
+            case JBOOL:
+            case JNULL:
+            case KIF:{
+                KIf *k = (KIf*) ok;
+                //check if it is true or false
+            }
+            case KAPP:{
+                KApp* ka = (KApp*) ok;
+                expr* ratorp = ka -> rator;
+                expr* vs = ka -> vs;
+                break;
+                // if there is no operator then ???
+                if(!ratorp){
+                    ratorp = oc;
+                }else{
+
+                }
+
+            }
+            case KRET:{
+                return;
+            }
+
+        }
+
+
+    }
+
+}
+
+expr * find_tag(expr *h){
+
+    return (JNull*)h -> head.tag;
+
+}
 
 
 

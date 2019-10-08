@@ -17,7 +17,6 @@ typedef enum {
 typedef enum {
 
 
-
 }Prim;
 
 typedef struct {
@@ -27,6 +26,13 @@ typedef struct {
 typedef struct {
     enum Tag tag
 }K;
+
+typedef struct {
+
+    expr head;
+
+}JNull;
+expr* make_JNull();
 
 typedef struct {
     expr head;
@@ -74,10 +80,9 @@ expr* make_JApp(expr* func, expr* args);
 typedef struct {
 
     expr head;
-    expr ret;
 
 }KRet;
-
+expr* make_KRet();
 
 typedef struct{
 
@@ -85,13 +90,30 @@ typedef struct{
     expr *t, *f, *c;
 
 }KIf;
-
+expr* make_KIf(expr* c, expr* t, expr* f);
 
 typedef struct{
 
     expr head;
+    expr rator;
     expr *vs;
     expr *es;
     expr *k;
 
 }KApp;
+expr* make_KApp(expr rator, expr* vs, expr* es, expr* k);
+
+void eval(expr* oc);
+
+
+
+
+
+
+
+
+
+
+
+
+
