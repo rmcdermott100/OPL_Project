@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+
 typedef enum {
     JNULL,
     JIF,
@@ -15,21 +16,23 @@ typedef enum {
 } Tag ;
 
 typedef enum {
-
-
+    ADD,
+    SUBTRACT
 }Prim;
 
 typedef struct {
-    enum Tag tag;
+    Tag tag;
 } expr;
 
+
 typedef struct {
-    enum Tag tag
+    enum Tag tag;
 }K;
 
-typedef struct {
+typedef struct{
 
     expr head;
+
 
 }JNull;
 expr* make_JNull();
@@ -38,11 +41,20 @@ typedef struct {
     expr head;
     int n;
 
-} JNum;
-
+}JNum;
 expr* make_JNum(int number);
 
-typedef struct{
+typedef struct {
+
+    expr head;
+    expr *left;
+    expr *right;
+
+}JCons;
+
+expr* make_JCons(expr* l, expr* r);
+
+typedef struct {
     expr head;
     bool b;
 
@@ -50,7 +62,7 @@ typedef struct{
 
 expr* make_JBool(bool boolean);
 
-typedef struct{
+typedef struct {
     expr head;
 	char p;
 
@@ -58,7 +70,7 @@ typedef struct{
 
 expr* make_JPrim(char prim);
 
-typedef struct{
+typedef struct {
 
     expr head;
     expr *c, *t, *f;
@@ -67,7 +79,7 @@ typedef struct{
 
 expr* make_JIf(expr* c, expr* t, expr * f);
 
-typedef struct{
+typedef struct {
 
     expr head;
 	expr* func;
@@ -84,7 +96,7 @@ typedef struct {
 }KRet;
 expr* make_KRet();
 
-typedef struct{
+typedef struct {
 
     expr head;
     expr *t, *f, *c;
@@ -92,16 +104,16 @@ typedef struct{
 }KIf;
 expr* make_KIf(expr* c, expr* t, expr* f);
 
-typedef struct{
+typedef struct {
 
     expr head;
-    expr rator;
+    expr *rator;
     expr *vs;
     expr *es;
     expr *k;
 
 }KApp;
-expr* make_KApp(expr rator, expr* vs, expr* es, expr* k);
+expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 
 void eval(expr* oc);
 

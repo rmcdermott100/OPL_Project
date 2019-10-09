@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "LL.h"
 
 
@@ -7,7 +8,7 @@
 
 expr* make_JNull(){
 
-    JNull* p = malloc(sizeof(JNull));
+    JNull* p = (JNull*)malloc(sizeof(JNull));
     p->head.tag = JNULL;
     return p;
 
@@ -15,80 +16,89 @@ expr* make_JNull(){
 
 expr* make_JNum(int number) {
 
-	JNum* p = malloc(sizeof(JNum));
+	JNum* p =(JNum*)malloc(sizeof(JNum));
 	p->head.tag = JNUM;
 	p->n = number;
-	return (expr*)p;
+	return p;
 
+}
+
+expr* make_JCons(expr* l, expr* r){
+
+    JCons *p = (JCons*)malloc(sizeof(JCons));
+    p->head.tag = JCONS;
+    p -> left = l;
+    p -> right = r;
+    return p;
 }
 
 expr* make_JBool(bool boolean) {
 
-	JBool* p = malloc(sizeof(JBool));
+	JBool* p = (JBool*)malloc(sizeof(JBool));
 	p->head.tag = JBOOL;
 	p->b = boolean;
-	return (expr*)p;
+	return p;
 
 }
 
 expr* make_JPrim(char prim) {
 
-	JPrim* p = malloc(sizeof(JPrim));
+	JPrim* p = (JPrim*)malloc(sizeof(JPrim));
 	p->head.tag = JPRIM;
 	p->p = prim;
-	return (expr*)p;
+	return p;
 
 }
 
 
 expr* make_JIf(expr* c, expr* t, expr * f) {
 
-	JIf *p = malloc(sizeof(JIf));
+	JIf *p = (JIf*)malloc(sizeof(JIf));
 	p->head.tag = JIF;
 	p->c = c;
 	p->t = t;
 	p->f = f;
-	return (expr*)p;
+	return p;
 
 }
 
 
 expr* make_JApp(expr* func, expr* args) {
 
-	JApp *p = malloc(sizeof(JApp));
+	JApp *p = (JApp*)malloc(sizeof(JApp));
 	p->head.tag = JAPP;
 	p->func = func;
 	p->args = args;
-	return (expr*)p;
+	return p;
 
 }
 
 expr* make_KRet(){
 
-    KRet *p = malloc(sizeof(KRet));
+    KRet *p = (KRet*)malloc(sizeof(KRet));
     p->head.tag = KRET;
-    return (expr*)p;
+    return p;
 }
 
 expr* make_KIf(expr* c, expr* t, expr* f){
 
-    KIf *p = malloc(sizeof(KIf));
+    KIf *p = (KIf*)malloc(sizeof(KIf));
     p->head.tag = KIF;
     p->t = t;
     p->f = f;
     p->c = c;
-    return (expr*)p;
+    return p;
 
 }
 
-expr* make_KApp(expr rator, expr* es, expr* vs, expr* k){
+expr* make_KApp(expr* rator, expr* es, expr* vs, expr* k){
 
-    KApp *p = malloc(sizeof(KApp));
+    KApp *p = (KApp*)malloc(sizeof(KApp));
     p-> rator = rator;
     p->es = es;
     p->vs = vs;
     p->k = k;
-    return (expr*)p;
+    return p;
 
 }
 
@@ -99,7 +109,7 @@ void eval(expr* oc){
     // does this insert and extract?
     while(1){
         switch(find_tag(oc)){
-            // each case updates e and k, the old k gets remembered
+            // case 1
             case JIF:{
                 JIf * c = (JIf *)oc;
                 oc = c->c;
@@ -116,8 +126,10 @@ void eval(expr* oc){
             case JPRIM:
             case JBOOL:
             case JNULL:
+            // case 2 and 3
             case KIF:{
                 KIf *k = (KIf*) ok;
+                //oc =
                 //check if it is true or false
             }
             case KAPP:{
@@ -129,28 +141,40 @@ void eval(expr* oc){
                 if(!ratorp){
                     ratorp = oc;
                 }else{
-
+                    vs = 1;//change
                 }
 
             }
             case KRET:{
                 return;
             }
-
         }
-
-
     }
+}
+
+Tag find_tag(expr *h){
+
+    JNull* l = (JNull *) h;
+
+    return l->head.tag;
 
 }
 
-expr * find_tag(expr *h){
+JBool * find_bool(expr* c){
 
-    return (JNull*)h -> head.tag;
+    c = 1;
 
 }
 
-
+int main(int argc, char * argv[]){
+//testing
+    JCons* x = make_JCons(make_JNum(5), make_JNull());
+    JNum *y = x->left;
+    printf("%d\n", y->n);
+    //make it so that expr can be any of the types so that jcons can hold many things?
+	printf("%d\n", (JNum*)(x->left)->n);
+    return 0;
+}
 
 
 
