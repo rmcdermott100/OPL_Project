@@ -156,7 +156,12 @@ void eval(expr* oc){
                             // rule 6
                             // oe = delta(ka->vs), ek = k
                         }else{
-                            // rule 5, take firs value in es and put at end of vs
+                            // rule 5, take first value in es and put at end of vs
+                            JCons* tmp = ka->es;
+                            ka = tmp -> right;
+                            oe = tmp -> left;
+                            // run delta function on the e i just popped to add to value list?
+                            ok = make_KApp(vs,ka);
                         }
                     }
                 }
@@ -193,6 +198,15 @@ int empty_list(expr* l){
 
 }
 
+void vs_push(JCons* vs, expr* p){
+    JCons* tmp = vs;
+    while(tmp -> right != NULL){
+        tmp = (JCons*)tmp -> right;
+    }
+    tmp->right = p;
+    vs = tmp;
+}
+
 void pretty_printer(expr* p){
     switch(find_tag(p)){
 
@@ -218,11 +232,32 @@ void pretty_printer(expr* p){
         }
     }
 
+}
+
+
+
+// write delta function for values
+// remember delta function is backwards
+
+int delta(expr* d){
+
+    switch(find_tag(d)){
+        case JNUM{
+            JNum * x = (JNum*)d;
+            return x->n;
+        }
+        case JBOOL{
+            JBool * x = (JBool*) d
+            return x->b
+        }
+        case JApp{
+            //looks to see what the JPrim is
+            ;
+        }
+    }
 
 }
 
-//write delta function for values
-// rmemeber delta function is backwards
 
 int main(int argc, char * argv[]){
 //testing
