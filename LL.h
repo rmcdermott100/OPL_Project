@@ -99,10 +99,10 @@ expr* make_KRet();
 typedef struct {
 
     expr head;
-    expr *t, *f, *c;
+    expr *t, *f, *c, *k;
 
 }KIf;
-expr* make_KIf(expr* c, expr* t, expr* f);
+expr* make_KIf(expr* c, expr* t, expr* f, expr* k);
 
 typedef struct {
 
@@ -116,7 +116,9 @@ typedef struct {
 expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 
 void eval(expr* oc);
-
+Tag find_tag(expr *h);
+bool j_false(expr* c);
+int empty_list(expr* l);
 
 
 

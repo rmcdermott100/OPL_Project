@@ -10,7 +10,7 @@ expr* make_JNull(){
 
     JNull* p = (JNull*)malloc(sizeof(JNull));
     p->head.tag = JNULL;
-    return p;
+    return (expr*) p;
 
 }
 
@@ -19,7 +19,7 @@ expr* make_JNum(int number) {
 	JNum* p =(JNum*)malloc(sizeof(JNum));
 	p->head.tag = JNUM;
 	p->n = number;
-	return p;
+	return (expr*)p;
 
 }
 
@@ -29,7 +29,7 @@ expr* make_JCons(expr* l, expr* r){
     p->head.tag = JCONS;
     p -> left = l;
     p -> right = r;
-    return p;
+    return (expr*)p;
 }
 
 expr* make_JBool(bool boolean) {
@@ -37,7 +37,7 @@ expr* make_JBool(bool boolean) {
 	JBool* p = (JBool*)malloc(sizeof(JBool));
 	p->head.tag = JBOOL;
 	p->b = boolean;
-	return p;
+	return (expr*)p;
 
 }
 
@@ -46,7 +46,7 @@ expr* make_JPrim(char prim) {
 	JPrim* p = (JPrim*)malloc(sizeof(JPrim));
 	p->head.tag = JPRIM;
 	p->p = prim;
-	return p;
+	return (expr*)p;
 
 }
 
@@ -58,7 +58,7 @@ expr* make_JIf(expr* c, expr* t, expr * f) {
 	p->c = c;
 	p->t = t;
 	p->f = f;
-	return p;
+	return (expr*)p;
 
 }
 
@@ -69,7 +69,7 @@ expr* make_JApp(expr* func, expr* args) {
 	p->head.tag = JAPP;
 	p->func = func;
 	p->args = args;
-	return p;
+	return (expr*)p;
 
 }
 
@@ -77,17 +77,18 @@ expr* make_KRet(){
 
     KRet *p = (KRet*)malloc(sizeof(KRet));
     p->head.tag = KRET;
-    return p;
+    return (expr*)p;
 }
 
-expr* make_KIf(expr* c, expr* t, expr* f){
+expr* make_KIf(expr* c, expr* t, expr* f, expr* k){
 
     KIf *p = (KIf*)malloc(sizeof(KIf));
     p->head.tag = KIF;
     p->t = t;
     p->f = f;
     p->c = c;
-    return p;
+    p->k = k;
+    return (expr*)p;
 
 }
 
@@ -98,7 +99,7 @@ expr* make_KApp(expr* rator, expr* es, expr* vs, expr* k){
     p->es = es;
     p->vs = vs;
     p->k = k;
-    return p;
+    return (expr*)p;
 
 }
 
@@ -122,31 +123,43 @@ void eval(expr* oc){
                 ok = make_KApp(NULL, make_JNull(), oe, c->args, ok);
                 break;
                 }
+            //values we switch onto what the continuation is
+            case JCONS:{
+
+            }
             case JNUM:
             case JPRIM:
             case JBOOL:
-            case JNULL:
-            // case 2 and 3
-            case KIF:{
-                KIf *k = (KIf*) ok;
-                //oc =
-                //check if it is true or false
-            }
-            case KAPP:{
-                KApp* ka = (KApp*) ok;
-                expr* ratorp = ka -> rator;
-                expr* vs = ka -> vs;
-                break;
-                // if there is no operator then ???
-                if(!ratorp){
-                    ratorp = oc;
-                }else{
-                    vs = 1;//change
+            case JNULL:{
+                switch(find_tag(ok)){
+                    case KRET:{
+                        return;
+                    }
+                    case KIF:{
+                        KIf *k = (KIf*) ok;
+                        oc = (j_false(oc)) ? k->t : k->f;
+                        oe = k->c;
+                        ok = k->k;
+                        break;
+                    }
+                    case KAPP:{
+                        KApp* ka = (KApp*) ok;
+                        expr* ratorp = ka -> rator;
+                        expr* vs = ka -> vs;
+                        if(!ratorp){
+                            ratorp = oc;
+                        }else{
+                            vs = make_JCons(oc, vs);
+                        }
+                        // maybe make es and vs vectors instead of linked list
+                        if(empty_list(ka->es)){
+                            // rule 6
+                            // oe = delta(ka->vs), ek = k
+                        }else{
+                            // rule 5, take firs value in es and put at end of vs
+                        }
+                    }
                 }
-
-            }
-            case KRET:{
-                return;
             }
         }
     }
@@ -154,25 +167,72 @@ void eval(expr* oc){
 
 Tag find_tag(expr *h){
 
-    JNull* l = (JNull *) h;
-
-    return l->head.tag;
+    return h->tag;
 
 }
 
-JBool * find_bool(expr* c){
+bool j_false(expr* c){
 
-    c = 1;
+    JIf *m = (JIf*) c;
+    JBool* boolean = (JBool*)m->c;
+    if(boolean -> b = true){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+int empty_list(expr* l){
+    JCons * tmp = (JCons*) l;
+    if (tmp -> left == NULL && tmp -> right == NULL || tmp->head.tag == JNULL){
+        return true;
+    }else{
+        return false;
+    }
+    return 0;
 
 }
+
+void pretty_printer(expr* p){
+    switch(find_tag(p)){
+
+        case JNUM:{
+            JNum* pp = (JNum*)p;
+            printf("%d\n", pp->n);
+            break;
+        }
+        case JBOOL:{
+            JBool *pp = (JBool*)p;
+            printf("%s\n", pp->b ? "true" : "false");
+            break;
+        }
+        case JPRIM:{
+            JPrim* pp = (JPrim*)p;
+            printf("%c\n", pp->p);
+            break;
+        }
+        case JNULL:{
+            JNull* pp = (JNull*)p;
+            printf("NULL\n");
+            break;
+        }
+    }
+
+
+}
+
+//write delta function for values
+// rmemeber delta function is backwards
 
 int main(int argc, char * argv[]){
 //testing
-    JCons* x = make_JCons(make_JNum(5), make_JNull());
-    JNum *y = x->left;
-    printf("%d\n", y->n);
-    //make it so that expr can be any of the types so that jcons can hold many things?
-	printf("%d\n", (JNum*)(x->left)->n);
+	expr* x = make_JNum(5);
+	eval(x);
+	pretty_printer(x);
+	expr* t = make_JCons(make_JNum(3), make_JNull());
+	expr* f = make_JCons(NULL,NULL);
+	printf("%d\n", empty_list(t));
+	printf("%d\n", empty_list(f));
     return 0;
 }
 

@@ -1,3 +1,5 @@
+import math
+
 class J1e(object):
    None
 
@@ -400,6 +402,5 @@ if __name__ == "__main__":
     emit_LL()
 
 
-    #print(step(JCons(JPrim("+"), JCons(JNum(7), JCons(JNum(1), JNull()))).pp()))
 
 
