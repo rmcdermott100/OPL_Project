@@ -123,9 +123,10 @@ typedef struct {
 }KApp;
 expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 
+void pretty_printer(expr* p);
 void free_list(expr* p);
-expr *japp_pop(JCons *vs);
-void japp_push(JCons *vs, expr* p);
+expr *japp_pop(JCons** vs);
+void japp_push(JCons** vs, expr* p);
 void eval(expr* oc);
 Tag find_tag(expr *h);
 bool j_false(expr* c);

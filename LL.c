@@ -171,7 +171,6 @@ void eval(expr* oc){
 }
 
 Tag find_tag(expr *h){
-
     return h->tag;
 
 }
@@ -195,7 +194,7 @@ bool j_false(expr* c){
 
 int empty_list(expr* l){
     JCons * tmp = (JCons*) l;
-    if (tmp -> left == NULL && tmp -> right == NULL || tmp->head.tag == JNULL){
+    if (tmp == NULL || tmp -> left == NULL && tmp -> right == NULL || tmp->head.tag == JNULL){
         return true;
     }else{
         return false;
@@ -205,34 +204,46 @@ int empty_list(expr* l){
 }
 
 void japp_push(JCons** vs, expr* p){
-    JCons* tmp = make_JCons(p,vs);
+    JNum* l  = (JNum*) p;
+    JCons* tmp = make_JCons(l,*vs);
     *vs = tmp;
 }
-
-expr* japp_pop(expr* vs){
-
-    JCons* tmp = vs;
-    expr* result = tmp->left;
-    vs = tmp->right;
-    free_list(tmp);
-    return result;
+// Return first and remove first combined is pop function
+expr* japp_return_first(JCons* vs){
+    return vs->left;
 }
 
-void free_list(JCons* p){
+expr* japp_remove_first(JCons* vs){
+
+    JCons* tmp = vs;
+    //expr* result = tmp->left;
+    vs = tmp -> right;
+    free(tmp);
+    return (expr*)vs;
+}
+
+
+
+void free_list(expr* p){
+    if(p == NULL){
+        return;
+    }
     switch(find_tag(p)){
         case JNULL:
         case JNUM:
         case JBOOL:
         case JPRIM:{
             free(p);
+            return;
         }
         case JCONS:{
             JCons* tmp = (JCons*)p;
             free_list(tmp->left);
             free_list(tmp->right);
+            free(p);
         }
     }
-    free(p);
+    //free(p);
 }
 
 
@@ -241,17 +252,17 @@ void pretty_printer(expr* p){
 
         case JNUM:{
             JNum* pp = (JNum*)p;
-            printf("%d\n", pp->n);
+            printf("jnum %d\n", pp->n);
             break;
         }
         case JBOOL:{
             JBool *pp = (JBool*)p;
-            printf("%s\n", pp->b ? "true" : "false");
+            printf("jbool %s\n", pp->b ? "true" : "false");
             break;
         }
         case JPRIM:{
             JPrim* pp = (JPrim*)p;
-            printf("%c\n", pp->p);
+            printf("jprim %d\n", pp->p);
             break;
         }
         case JNULL:{
@@ -283,13 +294,14 @@ int delta(expr* d){
         }
         case JAPP:{
             //looks to see what the JPrim is
-            JApp *x = (JApp*)d;
-            switch(find_prim(d)){
+            JApp *q = (JApp*)d;
+            switch(find_prim(q)){
                 case ADD:{
                     // add together the args, make d-> right jcons then add the values
-                    expr *z = japp_pop(x);
-
-                    expr *y = japp_pop(x);
+                    expr *z = japp_return_first(q->args);
+                    q->args = japp_remove_first(q->args);
+                    expr *y = japp_return_first(q->args);
+                    q->args = japp_remove_first(q->args);
 
                     return delta(z) + delta(y);
                 }
@@ -313,17 +325,18 @@ int main(int argc, char * argv[]){
 //testing
 
 	JCons* t = make_JCons(make_JNum(3), make_JNull());
-	JCons* l = make_JCons(make_JNum(7), make_JNull());
+	JNum* l = make_JNum(7);
     japp_push(&t, l);
-    Prim tmp = ADD;
-    JCons* b = japp_pop(t);
+    Prim* tmp = make_JPrim(ADD);
+
     //works
-    JNum *c = b->left;
-    pretty_printer(c);
+    JApp* v = make_JApp(tmp, t);
+
+    //JCons *r = t->right;
+    //pretty_printer(r->left);
 
 
-    //delta(t);
-    //pretty_printer(delta(v));
+    printf("%d",delta(v));
     return 0;
 }
 
