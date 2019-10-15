@@ -161,7 +161,7 @@ void eval(expr* oc){
                             ka = tmp -> right;
                             oe = tmp -> left;
                             // run delta function on the e i just popped to add to value list?
-                            ok = make_KApp(vs,ka);
+                            //ok = make_KApp(vs,ka);
                         }
                     }
                 }
@@ -174,6 +174,12 @@ Tag find_tag(expr *h){
 
     return h->tag;
 
+}
+
+Prim find_prim(expr* app){
+    JApp * papp = (JApp*) app;
+    JPrim * Jp = papp->func;
+    return Jp->p;
 }
 
 bool j_false(expr* c){
@@ -198,14 +204,37 @@ int empty_list(expr* l){
 
 }
 
-void vs_push(JCons* vs, expr* p){
-    JCons* tmp = vs;
-    while(tmp -> right != NULL){
-        tmp = (JCons*)tmp -> right;
-    }
-    tmp->right = p;
-    vs = tmp;
+void japp_push(JCons** vs, expr* p){
+    JCons* tmp = make_JCons(p,vs);
+    *vs = tmp;
 }
+
+expr* japp_pop(expr* vs){
+
+    JCons* tmp = vs;
+    expr* result = tmp->left;
+    vs = tmp->right;
+    free_list(tmp);
+    return result;
+}
+
+void free_list(JCons* p){
+    switch(find_tag(p)){
+        case JNULL:
+        case JNUM:
+        case JBOOL:
+        case JPRIM:{
+            free(p);
+        }
+        case JCONS:{
+            JCons* tmp = (JCons*)p;
+            free_list(tmp->left);
+            free_list(tmp->right);
+        }
+    }
+    free(p);
+}
+
 
 void pretty_printer(expr* p){
     switch(find_tag(p)){
@@ -236,23 +265,44 @@ void pretty_printer(expr* p){
 
 
 
+
+
 // write delta function for values
 // remember delta function is backwards
 
 int delta(expr* d){
 
     switch(find_tag(d)){
-        case JNUM{
+        case JNUM:{
             JNum * x = (JNum*)d;
             return x->n;
         }
-        case JBOOL{
-            JBool * x = (JBool*) d
-            return x->b
+        case JBOOL:{
+            JBool * x = (JBool*) d;
+            return x->b;
         }
-        case JApp{
+        case JAPP:{
             //looks to see what the JPrim is
-            ;
+            JApp *x = (JApp*)d;
+            switch(find_prim(d)){
+                case ADD:{
+                    // add together the args, make d-> right jcons then add the values
+                    expr *z = japp_pop(x);
+
+                    expr *y = japp_pop(x);
+
+                    return delta(z) + delta(y);
+                }
+                case SUBTRACT:{
+
+                }
+                case MULTIPLY:{
+
+                }
+                case DIVIDE:{
+
+                }
+            }
         }
     }
 
@@ -261,13 +311,19 @@ int delta(expr* d){
 
 int main(int argc, char * argv[]){
 //testing
-	expr* x = make_JNum(5);
-	eval(x);
-	pretty_printer(x);
-	expr* t = make_JCons(make_JNum(3), make_JNull());
-	expr* f = make_JCons(NULL,NULL);
-	printf("%d\n", empty_list(t));
-	printf("%d\n", empty_list(f));
+
+	JCons* t = make_JCons(make_JNum(3), make_JNull());
+	JCons* l = make_JCons(make_JNum(7), make_JNull());
+    japp_push(&t, l);
+    Prim tmp = ADD;
+    JCons* b = japp_pop(t);
+    //works
+    JNum *c = b->left;
+    pretty_printer(c);
+
+
+    //delta(t);
+    //pretty_printer(delta(v));
     return 0;
 }
 

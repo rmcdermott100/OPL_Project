@@ -17,7 +17,15 @@ typedef enum {
 
 typedef enum {
     ADD,
-    SUBTRACT
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    LESS_THAN,
+    GREATER_THAN,
+    EQUAL,
+    NOT_EQUAL,
+    LESS_THAN_EQUAL,
+    GREATER_THAN_EQUAL
 }Prim;
 
 typedef struct {
@@ -64,7 +72,7 @@ expr* make_JBool(bool boolean);
 
 typedef struct {
     expr head;
-	char p;
+	Prim p;
 
 } JPrim;
 
@@ -115,10 +123,14 @@ typedef struct {
 }KApp;
 expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 
+void free_list(expr* p);
+expr *japp_pop(JCons *vs);
+void japp_push(JCons *vs, expr* p);
 void eval(expr* oc);
 Tag find_tag(expr *h);
 bool j_false(expr* c);
 int empty_list(expr* l);
+Prim find_prim(expr* app);
 
 
 
