@@ -92,9 +92,10 @@ expr* make_KIf(expr* c, expr* t, expr* f, expr* k){
 
 }
 
-expr* make_KApp(expr* rator, expr* es, expr* vs, expr* k){
+expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k){
 
     KApp *p = (KApp*)malloc(sizeof(KApp));
+    p->head.tag == KAPP;
     p-> rator = rator;
     p->es = es;
     p->vs = vs;
@@ -109,6 +110,11 @@ void eval(expr* oc){
     expr* ok = make_KRet();
     // does this insert and extract?
     while(1){
+        //find tag of ok is not working second pass by beacuase of make_KApp functions???
+        // KApp struct and make function wrong?
+        printf("%d\n", find_tag(oc));
+        printf("%d\n", find_tag(ok));
+
         switch(find_tag(oc)){
             // case 1
             case JIF:{
@@ -120,7 +126,8 @@ void eval(expr* oc){
             case JAPP:{
                 JApp *c = (JApp*)oc;
                 oc = c->func;
-                ok = make_KApp(NULL, make_JNull(), oe, c->args, ok);
+                ok = (KApp*) make_KApp(make_JNull(), oe, c->args, ok);
+                printf("JIF");
                 break;
                 }
             //values we switch onto what the continuation is
@@ -131,6 +138,7 @@ void eval(expr* oc){
             case JPRIM:
             case JBOOL:
             case JNULL:{
+            return;
                 switch(find_tag(ok)){
                     case KRET:{
                         return;
@@ -151,17 +159,24 @@ void eval(expr* oc){
                         }else{
                             vs = make_JCons(oc, vs);
                         }
-                        // maybe make es and vs vectors instead of linked list
+                        // test these rules, then it should be done.
+
                         if(empty_list(ka->es)){
+                            printf("empty");
                             // rule 6
-                            // oe = delta(ka->vs), ek = k
+                            // oe = delta(ka->vs), ok = k
+                            oe = delta(ka->vs);
+                            ok = ka; //?
                         }else{
                             // rule 5, take first value in es and put at end of vs
+                            printf("not empty");
                             JCons* tmp = ka->es;
-                            ka = tmp -> right;
-                            oe = tmp -> left;
+                            ka -> es = tmp -> right;
+                            oe = japp_return_first(tmp);
+                            tmp = japp_remove_first(tmp);
                             // run delta function on the e i just popped to add to value list?
-                            //ok = make_KApp(vs,ka);
+                            japp_push(&vs, delta(oe));
+                            ok = make_KApp(ratorp,tmp, vs, ok);
                         }
                     }
                 }
@@ -176,8 +191,7 @@ Tag find_tag(expr *h){
 }
 
 Prim find_prim(expr* app){
-    JApp * papp = (JApp*) app;
-    JPrim * Jp = papp->func;
+    JPrim * Jp = (JPrim*) app;
     return Jp->p;
 }
 
@@ -281,29 +295,51 @@ void pretty_printer(expr* p){
 // write delta function for values
 // remember delta function is backwards
 
-int delta(expr* d){
+expr* delta(expr* d){
 
     switch(find_tag(d)){
         case JNUM:{
             JNum * x = (JNum*)d;
-            return x->n;
+            return x;
         }
         case JBOOL:{
             JBool * x = (JBool*) d;
-            return x->b;
+            return x;
+        }
+        case JIF:{
+
+        }
+        case JCONS:{
+            JCons* q = (JCons*)d;
+            JPrim * p = q->left;
+            switch(find_prim(p)){
+
+                case ADD:{
+                    int total = 0;
+                    q = q->right;
+                    while(find_tag(q) != JNULL){
+                        JNum* tmp = delta(q->left);
+                        q = q->right;
+                        total+=tmp->n;
+                    }
+                    return make_JNum(total);
+                }
+
+            }
         }
         case JAPP:{
             //looks to see what the JPrim is
             JApp *q = (JApp*)d;
-            switch(find_prim(q)){
+            switch(find_prim(q->func)){
                 case ADD:{
                     // add together the args, make d-> right jcons then add the values
                     expr *z = japp_return_first(q->args);
                     q->args = japp_remove_first(q->args);
                     expr *y = japp_return_first(q->args);
                     q->args = japp_remove_first(q->args);
-
-                    return delta(z) + delta(y);
+                    JNum * tmp1 = delta(z);
+                    JNum * tmp2 = delta(y);
+                    return make_JNum(tmp1->n + tmp2->n);
                 }
                 case SUBTRACT:{
 
@@ -335,8 +371,8 @@ int main(int argc, char * argv[]){
     //JCons *r = t->right;
     //pretty_printer(r->left);
 
-
-    printf("%d",delta(v));
+    eval(v);
+    pretty_printer(delta(v));
     return 0;
 }
 
