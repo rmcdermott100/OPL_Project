@@ -336,7 +336,7 @@ def test():
     print(step(JIf(JNum(7),JNum(5),JNum(0))))
     print(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0)).interp())
 
-
+#get gcc and then eval different things then run the code
 def emit_LL():
     f = open("x.c", "w")
     f.write("#include <stdio.h> \n")
