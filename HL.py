@@ -1,4 +1,4 @@
-import math
+from subprocess import call
 
 class J1e(object):
    None
@@ -208,8 +208,7 @@ class Elist(E):
 
 
 
-# changing the JApp tto CList might fix this
-# but i do not think it will work with nested apps and ifs (fix tomorrow)
+
 def step(e):
 
     cp, ep = find_redex(e)
@@ -319,53 +318,6 @@ class st():
         self.e = e
         self.E = E
 
-def inject(e):
-
-    return # e and a hole
-
-def extract(st):
-
-    return # E[e]
-
-def ccstep(st):
-
-    if type(st.e) is JIf:
-        stp = st(st.e.cond, EIf(EHole, st.e.tbr, st.e.fbr))
-        return stp
-
-    if type(st.e) is JBool and st.e.b == "True" and type(st.E) is EIf:
-        stp = st(st.E.tbr, st.E)
-        return stp
-
-    if type(st.e) is JBool and st.e.b == "False" and type(st.E) is EIf:
-        stp = st(st.E.fbr, st.E)
-        return stp
-
-    if type(st.E) is Elist and not st.E.vs:
-        stp = st(st.e.left, Elist([], EHole, st.e.right))
-        return stp
-
-    #last 2 using functions
-    if type(st.e) is JNum or type(st.e) is JBool or type(st.e) is JPrim and type(st.E)is Elist and st.E.es:
-        del(st.E.es[0])
-        stp = st(st.E.es[0], Elist(st.E.vs, EHole, st.E.es))
-        return stp
-
-    if type(st.e) is JNum or type(st.e) is JBool or type(st.e) is JPrim and type(st.E)is Elist and  not st.E.es:
-        stp = (st.E.vs.interp(), E)
-
-#function repoeresting cc machine
-def CC0(e):
-
-    while 1:
-        st = ccstep(e)
-        if type(st.e) is JPrim or type(st.e) is JBool or type(st.e) is JNum and type(st.E) is EHole:
-            break
-        st.E.plug(e)
-
-    return st.e
-    # done when i have a value and a hole
-
 
 
 def isNull(se):
@@ -387,18 +339,20 @@ def test():
 
 def emit_LL():
     f = open("x.c", "w")
-    f.write("#include <stdio.h> \n\n")
+    f.write("#include <stdio.h> \n")
+    f.write("#include \"LL.h\"\n\n")
     f.write("int main(int argc, char * argv[]) {\n")
     f.write("\tJNum* x = make_JNum(5); \n")
-    f.write("\tpretty_printer(x)\n")
+    f.write("\tpretty_printer(x;)\n")
     f.write("\treturn 0;\n")
     f.write("}")
     f.close()
+    #call(["x.c"])
 
 
 if __name__ == "__main__":
-    test()
-    #emit_LL()
+    #test()
+    emit_LL()
 
 
 

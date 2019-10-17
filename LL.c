@@ -112,8 +112,6 @@ void eval(expr* oc){
     while(1){
         //find tag of ok is not working second pass by beacuase of make_KApp functions???
         // KApp struct and make function wrong?
-        printf("%d\n", find_tag(oc));
-        printf("%d\n", find_tag(ok));
 
         switch(find_tag(oc)){
             // case 1
@@ -126,8 +124,8 @@ void eval(expr* oc){
             case JAPP:{
                 JApp *c = (JApp*)oc;
                 oc = c->func;
-                ok = make_KApp(make_JNull(), NULL, c->args, ok);
-                printf("JApp\n");
+                ok = make_KApp(NULL, make_JNull(), c->args, ok);
+
                 break;
                 }
             //values we switch onto what the continuation is
@@ -151,34 +149,31 @@ void eval(expr* oc){
                     }
 
                     case KAPP:{
-                    printf("KAPP");
+
                         KApp* ka = (KApp*) ok;
                         expr* ratorp = ka -> rator;
                         expr* vs = ka -> vs;
+
                         if(!ratorp){
                             ratorp = oc;
-                        }else{
-                            vs = make_JCons(oc, vs);
                         }
-                        // test these rules, then it should be done.
-
                         if(empty_list(ka->es)){
-                            printf("empty\n");
-                            // rule 6
-                            // oe = delta(ka->vs), ok = k
+                            // do not think the end of this is correct
                             japp_push(&vs, ratorp);
-                            oe = make_JNum(delta(vs));
-                            oc = oe;
+
+                            JNum *d = delta(vs);
+                            pretty_printer(d);
+                            oc = d;
                             ok = make_KRet(); //?
 
                         }else{
-                            // rule 5, take first value in es and push to vs
-                            printf("not empty\n");
+
+                            
                             JCons* tmp = ka->es;
                             ka -> es = tmp -> right;
                             oe = japp_return_first(tmp);
                             tmp = japp_remove_first(tmp);
-                            // run delta function on the e i just popped to add to value list?
+
                             japp_push(&vs, delta(oe));
                             ok = make_KApp(ratorp, vs, tmp, ok);
                         }
@@ -191,7 +186,6 @@ void eval(expr* oc){
 
 Tag find_tag(expr *h){
     return h->tag;
-
 }
 
 Prim find_prim(expr* app){
@@ -203,7 +197,7 @@ bool j_false(expr* c){
 
     JIf *m = (JIf*) c;
     JBool* boolean = (JBool*)m->c;
-    if(boolean -> b = true){
+    if(boolean -> b == true){
         return true;
     }else{
         return false;
@@ -212,7 +206,7 @@ bool j_false(expr* c){
 
 int empty_list(expr* l){
     JCons * tmp = (JCons*) l;
-    if (tmp == NULL || tmp -> left == NULL && tmp -> right == NULL || tmp->head.tag == JNULL){
+    if (tmp == NULL || tmp->head.tag == JNULL){
         return true;
     }else{
         return false;
@@ -221,9 +215,15 @@ int empty_list(expr* l){
 
 }
 
-void japp_push(JCons** vs, expr* p){
+void japp_push(expr** vs, expr* p){
     JNum* l  = (JNum*) p;
-    JCons* tmp = make_JCons(l,*vs);
+    JCons *tmp = *vs;
+    JNull* x = make_JNull();
+    if (find_tag(*vs) == JNULL){
+        tmp = make_JCons(l, x);
+    }else{
+        tmp = make_JCons(l,*vs);
+    }
     *vs = tmp;
 }
 // Return first and remove first combined is pop function
@@ -241,28 +241,6 @@ expr* japp_remove_first(JCons* vs){
 }
 
 
-
-void free_list(expr* p){
-    if(p == NULL){
-        return;
-    }
-    switch(find_tag(p)){
-        case JNULL:
-        case JNUM:
-        case JBOOL:
-        case JPRIM:{
-            free(p);
-            return;
-        }
-        case JCONS:{
-            JCons* tmp = (JCons*)p;
-            free_list(tmp->left);
-            free_list(tmp->right);
-            free(p);
-        }
-    }
-    //free(p);
-}
 
 
 void pretty_printer(expr* p){
@@ -287,6 +265,14 @@ void pretty_printer(expr* p){
             JNull* pp = (JNull*)p;
             printf("NULL\n");
             break;
+        }case JCONS:{
+            JCons* pp = (JCons*)p;
+            printf("JCONS start\n");
+            while(find_tag(pp->right) != JNULL){
+                pretty_printer(pp->left);
+                pp = pp->right;
+            }
+            printf("JCONS End\n");
         }
     }
 
@@ -302,6 +288,14 @@ void pretty_printer(expr* p){
 expr* delta(expr* d){
 
     switch(find_tag(d)){
+        case JPRIM:{
+            JPrim* x = (JPrim *)d;
+            return x;
+        }
+        case JNULL:{
+            JNull* x = (JNull *)d;
+            return x;
+        }
         case JNUM:{
             JNum * x = (JNum*)d;
             return x;
@@ -319,19 +313,18 @@ expr* delta(expr* d){
             switch(find_prim(p)){
 
                 case ADD:{
-                printf("add\n");
+
                     int total = 0;
-                    q = q->right;
+                    q = japp_remove_first(q);
+
                     while(find_tag(q) != JNULL){
-                        JNum* tmp = delta(q->left);
-                        pretty_printer(tmp);
-                        JCons* tmp2 = q->right;
-                        q = tmp2;
+
+                        JNum* tmp = japp_return_first(q);
+                        q = japp_remove_first(q);
                         total+=tmp->n;
                     }
                     return make_JNum(total);
                 }
-
             }
         }
         case JAPP:{
@@ -373,6 +366,7 @@ int main(int argc, char * argv[]){
 
     Prim* tmp = make_JPrim(ADD);
     japp_push(&t, tmp);
+
     //pretty_printer(delta(t));
     //works
     JApp* v = make_JApp(tmp, t);
@@ -381,9 +375,8 @@ int main(int argc, char * argv[]){
     //pretty_printer(r->left);
 
     eval(v);
-    printf("%d\n",find_tag(v));
-    JNum *f = v;
-    pretty_printer(f);
+    //printf("%d\n",find_tag(v));
+    //pretty_printer(v);
 
     return 0;
 }

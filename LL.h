@@ -33,9 +33,6 @@ typedef struct {
 } expr;
 
 
-typedef struct {
-    Tag tag;
-}K;
 
 typedef struct{
 

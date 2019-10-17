@@ -19,7 +19,7 @@
 (LL) Define data structures to represent J1 programs. (COMPLETED)
 (HL) Write a function that emit HL-J1 programs as LL-J1 programs.(COMPLETED)
 (LL) Define data structures to represent continuations.(COMPLETED)
-(LL) Implement the CK0 machine interpreter for J1.
+(LL) Implement the CK0 machine interpreter for J1.(COMPLETED)
 (HL) Connect your test-suite to your CK0 interpreter to verify that it works.
 (HL & LL) Define data structures to represent J2 programs and function definitions.
 (HL) Write a test-suite of a dozen J2 programs.
