@@ -3,5 +3,4 @@ Project for OPL class
 
 Uses python to create programming language.
  
-
-created low level data structures
+almost done with ck! (i think)

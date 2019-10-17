@@ -95,7 +95,7 @@ expr* make_KIf(expr* c, expr* t, expr* f, expr* k){
 expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k){
 
     KApp *p = (KApp*)malloc(sizeof(KApp));
-    p->head.tag == KAPP;
+    p->head.tag = KAPP;
     p-> rator = rator;
     p->es = es;
     p->vs = vs;
@@ -126,8 +126,8 @@ void eval(expr* oc){
             case JAPP:{
                 JApp *c = (JApp*)oc;
                 oc = c->func;
-                ok = (KApp*) make_KApp(make_JNull(), oe, c->args, ok);
-                printf("JIF");
+                ok = make_KApp(make_JNull(), NULL, c->args, ok);
+                printf("JApp\n");
                 break;
                 }
             //values we switch onto what the continuation is
@@ -138,7 +138,6 @@ void eval(expr* oc){
             case JPRIM:
             case JBOOL:
             case JNULL:{
-            return;
                 switch(find_tag(ok)){
                     case KRET:{
                         return;
@@ -150,7 +149,9 @@ void eval(expr* oc){
                         ok = k->k;
                         break;
                     }
+
                     case KAPP:{
+                    printf("KAPP");
                         KApp* ka = (KApp*) ok;
                         expr* ratorp = ka -> rator;
                         expr* vs = ka -> vs;
@@ -162,21 +163,24 @@ void eval(expr* oc){
                         // test these rules, then it should be done.
 
                         if(empty_list(ka->es)){
-                            printf("empty");
+                            printf("empty\n");
                             // rule 6
                             // oe = delta(ka->vs), ok = k
-                            oe = delta(ka->vs);
-                            ok = ka; //?
+                            japp_push(&vs, ratorp);
+                            oe = make_JNum(delta(vs));
+                            oc = oe;
+                            ok = make_KRet(); //?
+
                         }else{
-                            // rule 5, take first value in es and put at end of vs
-                            printf("not empty");
+                            // rule 5, take first value in es and push to vs
+                            printf("not empty\n");
                             JCons* tmp = ka->es;
                             ka -> es = tmp -> right;
                             oe = japp_return_first(tmp);
                             tmp = japp_remove_first(tmp);
                             // run delta function on the e i just popped to add to value list?
                             japp_push(&vs, delta(oe));
-                            ok = make_KApp(ratorp,tmp, vs, ok);
+                            ok = make_KApp(ratorp, vs, tmp, ok);
                         }
                     }
                 }
@@ -315,11 +319,14 @@ expr* delta(expr* d){
             switch(find_prim(p)){
 
                 case ADD:{
+                printf("add\n");
                     int total = 0;
                     q = q->right;
                     while(find_tag(q) != JNULL){
                         JNum* tmp = delta(q->left);
-                        q = q->right;
+                        pretty_printer(tmp);
+                        JCons* tmp2 = q->right;
+                        q = tmp2;
                         total+=tmp->n;
                     }
                     return make_JNum(total);
@@ -363,8 +370,10 @@ int main(int argc, char * argv[]){
 	JCons* t = make_JCons(make_JNum(3), make_JNull());
 	JNum* l = make_JNum(7);
     japp_push(&t, l);
-    Prim* tmp = make_JPrim(ADD);
 
+    Prim* tmp = make_JPrim(ADD);
+    japp_push(&t, tmp);
+    //pretty_printer(delta(t));
     //works
     JApp* v = make_JApp(tmp, t);
 
@@ -372,7 +381,10 @@ int main(int argc, char * argv[]){
     //pretty_printer(r->left);
 
     eval(v);
-    pretty_printer(delta(v));
+    printf("%d\n",find_tag(v));
+    JNum *f = v;
+    pretty_printer(f);
+
     return 0;
 }
 

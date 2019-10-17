@@ -379,10 +379,9 @@ def isNull(se):
 
 def test():
 
-    print(step(JApp(JPrim("+"), JCons(JNum(7), JCons(JNum(5), JNull())))))
-    print(JNum(6))
+    print(step(JApp(JPrim("+"), JCons(JNum(7), JCons(JNum(5), JNull())))).interp())
+    print(JNum(6).interp())
     print(step(JIf(JNum(7),JNum(5),JNum(0))))
-    print(step(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0))))
     print(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0)).interp())
 
 
@@ -390,16 +389,16 @@ def emit_LL():
     f = open("x.c", "w")
     f.write("#include <stdio.h> \n\n")
     f.write("int main(int argc, char * argv[]) {\n")
-    f.write("\tJNum x = {.n = 5}; \n")
-    f.write("\tprintf(\"%d\", x.n);\n")
+    f.write("\tJNum* x = make_JNum(5); \n")
+    f.write("\tpretty_printer(x)\n")
     f.write("\treturn 0;\n")
     f.write("}")
     f.close()
 
 
 if __name__ == "__main__":
-    #test()
-    emit_LL()
+    test()
+    #emit_LL()
 
 
 

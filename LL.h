@@ -34,7 +34,7 @@ typedef struct {
 
 
 typedef struct {
-    enum Tag tag;
+    Tag tag;
 }K;
 
 typedef struct{
