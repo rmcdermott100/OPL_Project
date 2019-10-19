@@ -1,4 +1,6 @@
+import os
 from subprocess import call
+import time
 
 class J1e(object):
    None
@@ -342,12 +344,19 @@ def emit_LL():
     f.write("#include <stdio.h> \n")
     f.write("#include \"LL.h\"\n\n")
     f.write("int main(int argc, char * argv[]) {\n")
-    f.write("\tJNum* x = make_JNum(5); \n")
-    f.write("\tpretty_printer(x;)\n")
+    f.write("\tJNum* g1 = make_JNum(5);\n")
+    f.write("\tJCons* g2 = make_JCons(make_JNum(3), make_JNull());\n")
+    f.write("\tjapp_push(&g2, g1);\n")
+    f.write("\tJPrim* g3 = make_JPrim(ADD);\n")
+    f.write("\tJApp *g4 = make_JApp(g3, g2);\n")
+    f.write("\teval(g4);\n")
     f.write("\treturn 0;\n")
     f.write("}")
     f.close()
-    #call(["x.c"])
+
+    call(["gcc", "-w", os.path.abspath("x.c"), os.path.abspath("LL.c"), "-o", "x"])
+    time.sleep(1)
+    call([os.path.abspath("x")])
 
 
 if __name__ == "__main__":

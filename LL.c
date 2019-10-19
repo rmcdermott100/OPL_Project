@@ -227,13 +227,14 @@ void japp_push(expr** vs, expr* p){
     *vs = tmp;
 }
 // Return first and remove first combined is pop function
-expr* japp_return_first(JCons* vs){
-    return vs->left;
+expr* japp_return_first(expr* vs){
+    JCons* tmp = (JCons*)vs;
+    return tmp->left;
 }
 
-expr* japp_remove_first(JCons* vs){
+expr* japp_remove_first(expr* vs){
 
-    JCons* tmp = vs;
+    JCons* tmp = (JCons*)vs;
     //expr* result = tmp->left;
     vs = tmp -> right;
     free(tmp);
@@ -355,7 +356,7 @@ expr* delta(expr* d){
     }
 
 }
-
+/*
 
 int main(int argc, char * argv[]){
 //testing
@@ -380,6 +381,7 @@ int main(int argc, char * argv[]){
 
     return 0;
 }
+*/
 
 
 

@@ -122,9 +122,9 @@ expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 
 void pretty_printer(expr* p);
 void free_list(expr* p);
-expr *japp_remove_first(JCons** vs);
-expr* japp_return_first(JCons** vs);
-void japp_push(JCons** vs, expr* p);
+expr *japp_remove_first(expr* vs);
+expr* japp_return_first(expr* vs);
+void japp_push(expr** vs, expr* p);
 void eval(expr* oc);
 Tag find_tag(expr *h);
 bool j_false(expr* c);
