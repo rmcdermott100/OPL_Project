@@ -13,6 +13,9 @@ typedef enum {
     KIF,
     KAPP,
     JCONS,
+    JVAR,
+    JFUNC,
+    JDEF
 } Tag ;
 
 typedef enum {
@@ -32,12 +35,33 @@ typedef struct {
     Tag tag;
 } expr;
 
+typedef struct{
+    expr head;
+    char * v;
+}JVar;
+expr* make_JVar(char * v);
+
+typedef struct{
+
+    expr head;
+    char * f;
+
+}JFunc;
+expr* make_JFunc(char * f);
+
+typedef struct{
+
+    expr head;
+    expr* func;
+    expr* vars;
+    expr* e;
+} JDef;
+expr* make_JDef(expr* f, expr* v, expr* e);
 
 
 typedef struct{
 
     expr head;
-
 
 }JNull;
 expr* make_JNull();

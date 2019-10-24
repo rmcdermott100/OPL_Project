@@ -11,14 +11,52 @@ class C(object):
 class E(object):
     None
 
+class JVar(J1e): # start with lowercase letter
+    var = None # name of functions
+
+    def __init__(self,v):
+        self.var = v
+
+    def pp(self):
+        return self.var
+
+    def subst(self, x, v):
+        if self.var == x:
+            return v
+        else:
+            return self
+
+class JFunc(J1e): # should make a dict of functions
+    func = None
+
+    def __init__(self, f):
+        self.func = f
+
+    def pp(self):
+        return "variables:\n"+self.v +"\nfunction:\n"+self.e.pp()
+
+class JDef():
+    func = None
+    vars = []
+    e = None
+
+    def __init__(self,f,v,e):
+        self.func = f
+        self.vars = v
+        self.e = e
+
+    def subst(self,x,v):
+        None
 
 class JNull(J1e):
     x = None
 
     def pp(self):
-        return "x"
+        return "NULL"
     def interp(self):
         return 0
+    def subst(self,x,v):
+        return
 
 class JCons(J1e):
 
@@ -35,6 +73,10 @@ class JCons(J1e):
     def interp(self):
         return JCons(self.left.interp(), self.right.interp())
 
+    def subst(self,x,v):
+        self.left.subst(x,v)
+        self.right.subst(x,v)
+
 class JPrim(J1e):
     p = None
 
@@ -42,7 +84,7 @@ class JPrim(J1e):
         self.p = prim
 
     def pp(self):
-        return self.p
+        return ""+self.p
 
     def interp(self):
         return self.p
@@ -54,7 +96,7 @@ class JBool(J1e):
         self.b = boolean
 
     def pp(self):
-        return self.b
+        return ""+self.b
 
     def interp(self):
         return self.b
@@ -78,6 +120,12 @@ class JIf(J1e):
             return self.fbr.interp()
         else:
             return self.tbr.interp()
+
+    def subst(self,x,v):
+        self.cond.subst(x,v)
+        self.tbr.subst(x,v)
+        self.fbr.subst(x,v)
+
 
 class JApp(J1e):
     fun = None
@@ -124,6 +172,8 @@ class JApp(J1e):
         if p == "!=":
             return JBool(lhs != rhs)
 
+    def subst(self,x,v):
+        self.args.subst(x,v)
 
 class JNum(J1e):
     n = None
@@ -332,13 +382,10 @@ def isNull(se):
 
 
 def test():
+    None
 
-    print(step(JApp(JPrim("+"), JCons(JNum(7), JCons(JNum(5), JNull())))).interp())
-    print(JNum(6).interp())
-    print(step(JIf(JNum(7),JNum(5),JNum(0))))
-    print(JIf(JApp(JPrim("<"), JCons(JNum(4), JCons(JNum(5), JNull()))), JNum(1), JNum(0)).interp())
 
-#get gcc and then eval different things then run the code
+
 def emit_LL():
     f = open("x.c", "w")
     f.write("#include <stdio.h> \n")
@@ -360,8 +407,8 @@ def emit_LL():
 
 
 if __name__ == "__main__":
-    #test()
-    emit_LL()
+    test()
+    #emit_LL()
 
 
 

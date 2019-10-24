@@ -4,7 +4,33 @@
 #include "LL.h"
 
 
-// make Vcons and econs linked lists for the KApp structure?
+expr* make_JVar(char* v){
+
+    JVar* p = (JVar*)malloc(sizeof(JVar));
+    p->head.tag = JVAR;
+    p->v = v;
+    return (expr*)v;
+}
+
+expr* make_Jfunc(char* f){
+
+    JFunc* p = (JFunc*)malloc(sizeof(JFunc));
+    p->head.tag = JDEF;
+    p->f = f;
+    return (expr*)p;
+
+}
+
+expr* make_JDef(expr *f, expr* v, expr* e){
+
+    JDef * p = malloc(sizeof(JDef));
+    p->head.tag = JDEF;
+    p->func = f;
+    p->vars = v;
+    p->e = e;
+    return (expr*)p;
+
+}
 
 expr* make_JNull(){
 
