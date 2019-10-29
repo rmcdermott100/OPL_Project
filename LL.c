@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include "LL.h"
+
 
 
 expr* make_JVar(char* v){
@@ -382,6 +384,42 @@ expr* delta(expr* d){
     }
 
 }
+
+//
+expr* subst(expr* e, char* x, JNum *v){
+    //depending on the expression substitute differently
+    switch(find_tag(e)){
+        case JVAR:{
+            JVar * temp = (JVar*) e;
+            if !(strcmp(temp.var, x)){
+                return v;
+            }else{
+                return e;
+            }
+        }
+        case JIF:{
+            //sub each element of jif
+            JIf* temp = (JIf*) e;
+            JIf* l = make_JIf(subst(temp->c, x,v), subst(temp->t, x,v), subst(temp->f, x,v));
+            return l;
+        }
+        case JCONS:{
+
+        }
+        case JAPP:{
+
+        }
+        case JDEF:{
+
+        }
+        default:{
+            //these should not have any /variables in them
+        }
+    }
+
+}
+
+
 /*
 
 int main(int argc, char * argv[]){

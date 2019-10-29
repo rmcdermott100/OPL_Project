@@ -46,7 +46,7 @@ class JDef():
         self.e = e
 
     def subst(self,x,v):
-        None
+        self.e.subst(x,v)
 
 class JNull(J1e):
     x = None
@@ -89,6 +89,9 @@ class JPrim(J1e):
     def interp(self):
         return self.p
 
+    def subst(self,x,v):
+        None
+
 class JBool(J1e):
     b = None
 
@@ -100,6 +103,9 @@ class JBool(J1e):
 
     def interp(self):
         return self.b
+
+    def subst(self,x,v):
+        None
 
 class JIf(J1e):
     cond = None
@@ -185,6 +191,9 @@ class JNum(J1e):
 
     def interp(self):
         return int(self.n)
+
+    def subst(self,x,v):
+        None
 
 class Se(object):
     None
