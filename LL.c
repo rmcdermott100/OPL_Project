@@ -391,10 +391,10 @@ expr* subst(expr* e, char* x, JNum *v){
     switch(find_tag(e)){
         case JVAR:{
             JVar * temp = (JVar*) e;
-            if !(strcmp(temp.var, x)){
-                return v;
-            }else{
+            if (strcmp(temp->v, x)){
                 return e;
+            }else{
+                return v;
             }
         }
         case JIF:{
@@ -404,16 +404,24 @@ expr* subst(expr* e, char* x, JNum *v){
             return l;
         }
         case JCONS:{
-
+            JCons * temp = (JCons*) e;
+            temp = subst(temp -> left, x,v);
+            temp = subst(temp -> right, x,v);
+            return temp;
         }
         case JAPP:{
-
+            JApp* temp = (JApp*) e;
+            temp->args = subst(temp->args, x,v);
+            return temp;
         }
         case JDEF:{
-
+            JDef * temp = (JDef*) e;
+            temp -> e = subst(temp->e, x,v);
+            return temp;
         }
         default:{
-            //these should not have any /variables in them
+            //these should not have any variables in them
+            return e;
         }
     }
 

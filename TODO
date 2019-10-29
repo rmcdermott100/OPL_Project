@@ -24,8 +24,8 @@
 (HL & LL) Define data structures to represent J2 programs and function definitions.(COMPLETED)
 (HL) Write a test-suite of a dozen J2 programs.(COMPLETED)
 (HL) Define a substitution function that plugs the value of a variable into references to that variable.(COMPLETED)
-(HL) Extend your big-step interpreter to evaluate J2 programs.
-(LL) Define a substitution function that plugs the value of a variable into references to that variable.
+(HL) Extend your big-step interpreter to evaluate J2 programs.(COMPLETED)
+(LL) Define a substitution function that plugs the value of a variable into references to that variable.(COMPLETED)
 (LL) Extend your CK0 machine into the CK1 to evaluate J2 programs.
 (LL) Modify your CK1 machine into the CEK0 machine.
 (LL) Write test cases that verify your CEK0 machine does NOT have dynamic scope.
