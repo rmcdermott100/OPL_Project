@@ -186,17 +186,36 @@ void eval(expr* oc){
                             ratorp = oc;
                         }
                         if(empty_list(ka->es)){
-                            // do not think the end of this is correct
-                            japp_push(&vs, ratorp);
 
-                            JNum *d = delta(vs);
-                            pretty_printer(d);
-                            oc = d;
-                            ok = make_KRet(); //?
+                            JCons * temp2 = (JCons *) ka -> vs;
+
+                            if(find_tag(temp2->left) == JDEF){
+                                //subs the vars in the def, and return the expression of the function?
+                                JDef * def = temp2 -> left;
+                                JCons * vals = temp2 -> right;
+                                //while loop that repeats until one of the lists are empty?
+                                //should contain equal # of values and variables
+                                while(find_tag(vals) != JNULL){
+                                    def -> e = subst(def->e, japp_return_first(def->vars), japp_return_first(vals));
+                                    vals = japp_remove_first(vals);
+                                    def->vars = japp_remove_first(def->vars);
+                                }
+                                // remake japp with just the expression?
+                                // finish this part then it works?
+                                
+
+                            }else{
+
+                                japp_push(&vs, ratorp);
+                                JNum *d = delta(vs);
+                                pretty_printer(d);
+                                oc = d;
+                                //shouldnt need this kret, but idk how to pop if off after i do the work?
+                                ok = make_KRet();
+                            }
 
                         }else{
 
-                            
                             JCons* tmp = ka->es;
                             ka -> es = tmp -> right;
                             oe = japp_return_first(tmp);
@@ -428,7 +447,7 @@ expr* subst(expr* e, char* x, JNum *v){
 }
 
 
-/*
+
 
 int main(int argc, char * argv[]){
 //testing
@@ -453,7 +472,7 @@ int main(int argc, char * argv[]){
 
     return 0;
 }
-*/
+
 
 
 
