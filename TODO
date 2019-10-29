@@ -26,7 +26,7 @@
 (HL) Define a substitution function that plugs the value of a variable into references to that variable.(COMPLETED)
 (HL) Extend your big-step interpreter to evaluate J2 programs.(COMPLETED)
 (LL) Define a substitution function that plugs the value of a variable into references to that variable.(COMPLETED)
-(LL) Extend your CK0 machine into the CK1 to evaluate J2 programs.
+(LL) Extend your CK0 machine into the CK1 to evaluate J2 programs.(COMPLETED?, finish when i do cek?)
 (LL) Modify your CK1 machine into the CEK0 machine.
 (LL) Write test cases that verify your CEK0 machine does NOT have dynamic scope.
 (LL) Make a tweak to the CEK0 machine to give it dynamic scope, commit that, then revert it.
