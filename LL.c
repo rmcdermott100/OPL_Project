@@ -141,6 +141,8 @@ void eval(expr* oc){
         //find tag of ok is not working second pass by beacuase of make_KApp functions???
         // KApp struct and make function wrong?
 
+        eval_state(oc, ok);
+
         switch(find_tag(oc)){
             // case 1
             case JIF:{
@@ -152,7 +154,7 @@ void eval(expr* oc){
             case JAPP:{
                 JApp *c = (JApp*)oc;
                 oc = c->func;
-                ok = make_KApp(NULL, make_JNull(), c->args, ok);
+                ok = make_KApp(c->func, make_JNull(), c->args, ok);
 
                 break;
                 }
@@ -163,9 +165,12 @@ void eval(expr* oc){
             case JNUM:
             case JPRIM:
             case JBOOL:
+            case JVAR://?
             case JNULL:{
                 switch(find_tag(ok)){
                     case KRET:{
+
+                        pretty_printer(oc);
                         return;
                     }
                     case KIF:{
@@ -181,10 +186,9 @@ void eval(expr* oc){
                         KApp* ka = (KApp*) ok;
                         expr* ratorp = ka -> rator;
                         expr* vs = ka -> vs;
-
-                        if(!ratorp){
+                        /*if(!ratorp){
                             ratorp = oc;
-                        }
+                        }*/
                         if(empty_list(ka->es)){
 
                             JCons * temp2 = (JCons *) ka -> vs;
@@ -208,21 +212,39 @@ void eval(expr* oc){
 
                                 japp_push(&vs, ratorp);
                                 JNum *d = delta(vs);
-                                pretty_printer(d);
+                                oe = d;
                                 oc = d;
-                                //shouldnt need this kret, but idk how to pop if off after i do the work?
-                                ok = make_KRet();
+                                if(find_tag(ka -> k) == KAPP){
+                                    KApp * m = (KApp*) ka ->k;
+                                    japp_push(&m ->es, d);
+                                }
+                                //pretty_printer(d);
+                                ok = ka -> k;
+                                break;
                             }
 
                         }else{
 
                             JCons* tmp = ka->es;
-                            ka -> es = tmp -> right;
-                            oe = japp_return_first(tmp);
-                            tmp = japp_remove_first(tmp);
+                            pretty_printer(ka->es);
+                            if (find_tag(tmp -> left) == JNUM){
 
-                            japp_push(&vs, delta(oe));
-                            ok = make_KApp(ratorp, vs, tmp, ok);
+                                ka -> es = tmp -> right;
+                                oe = japp_return_first(tmp);
+                                tmp = japp_remove_first(tmp);
+                                japp_push(&vs, oe);
+                                ka -> vs = vs;
+                                ka -> es = tmp;
+
+                                break;
+                            }else{
+
+                                oc = tmp->left;
+                                ka -> es = japp_remove_first(ka ->es);
+                                ok = ka;
+                                break;
+
+                            }
                         }
                     }
                 }
@@ -232,6 +254,7 @@ void eval(expr* oc){
 }
 
 Tag find_tag(expr *h){
+
     return h->tag;
 }
 
@@ -260,6 +283,55 @@ int empty_list(expr* l){
     }
     return 0;
 
+}
+
+void eval_state(expr* e, expr* k){
+
+    switch(find_tag(e)){
+        case JNUM:{
+            printf("(JNUM ");
+            break;
+        }
+        case JIF:{
+            printf("(JIF ");
+            break;
+        }
+        case JAPP:{
+            printf("(JAPP ");
+            break;
+        }
+        case JPRIM:{
+            printf("(JPRIM ");
+            break;
+        }
+        case JNULL:{
+            printf("(JNULL ");
+            break;
+        }
+        case JBOOL:{
+            printf("(JBOOL ");
+            break;
+        }
+        case JCONS:{
+            printf("(JCONS ");
+            break;
+        }
+    }
+    switch(find_tag(k)){
+        case KAPP:{
+            printf("KAPP) \n");
+            break;
+        }
+        case KIF:{
+            printf("KIF) \n");
+            break;
+        }
+        case KRET:{
+            printf("KRET) \n");
+            break;
+        }
+
+    }
 }
 
 void japp_push(expr** vs, expr* p){
@@ -313,14 +385,24 @@ void pretty_printer(expr* p){
             JNull* pp = (JNull*)p;
             printf("NULL\n");
             break;
-        }case JCONS:{
+        }
+		case JCONS:{
             JCons* pp = (JCons*)p;
             printf("JCONS start\n");
-            while(find_tag(pp->right) != JNULL){
+            while(find_tag(pp) != JNULL){
                 pretty_printer(pp->left);
                 pp = pp->right;
             }
             printf("JCONS End\n");
+            break;
+        }
+        case JAPP:{
+            JApp* pp = (JApp*) p;
+            printf("func = ");
+            pretty_printer(pp->func);
+            printf("args = ");
+            pretty_printer(pp->args);
+            break;
         }
     }
 
@@ -330,8 +412,6 @@ void pretty_printer(expr* p){
 
 
 
-// write delta function for values
-// remember delta function is backwards
 
 expr* delta(expr* d){
 
@@ -342,7 +422,7 @@ expr* delta(expr* d){
         }
         case JNULL:{
             JNull* x = (JNull *)d;
-            return x;
+            return 0;
         }
         case JNUM:{
             JNum * x = (JNum*)d;
@@ -446,29 +526,26 @@ expr* subst(expr* e, char* x, JNum *v){
 
 }
 
+void test(void){
+    /*
+    JCons* t = make_JCons(make_JNum(3), make_JNull());
+	JNum* l = make_JNum(7);
+    japp_push(&t, l);
+    Prim* tmp = make_JPrim(ADD);
+    japp_push(&t, tmp);
+    */
+    JApp* q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));
+    JApp* v = make_JApp(make_JPrim(ADD), make_JCons(q, make_JCons(make_JNum(3), make_JNull())));
+
+    eval(v);
+
+}
 
 
 
 int main(int argc, char * argv[]){
-//testing
 
-	JCons* t = make_JCons(make_JNum(3), make_JNull());
-	JNum* l = make_JNum(7);
-    japp_push(&t, l);
-
-    Prim* tmp = make_JPrim(ADD);
-    japp_push(&t, tmp);
-
-    //pretty_printer(delta(t));
-    //works
-    JApp* v = make_JApp(tmp, t);
-
-    //JCons *r = t->right;
-    //pretty_printer(r->left);
-
-    eval(v);
-    //printf("%d\n",find_tag(v));
-    //pretty_printer(v);
+    test();
 
     return 0;
 }

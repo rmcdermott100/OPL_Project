@@ -33,7 +33,7 @@ class JFunc(J1e): # should make a dict of functions
         self.func = f
 
     def pp(self):
-        return "variables:\n"+self.v +"\nfunction:\n"+self.e.pp()
+        return self.func
 
 class JDef():
     func = None
