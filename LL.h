@@ -35,6 +35,8 @@ typedef struct {
     Tag tag;
 } expr;
 
+
+
 typedef struct{
     expr head;
     char * v;
@@ -52,12 +54,19 @@ expr* make_JFunc(char * f);
 typedef struct{
 
     expr head;
-    expr* func;
+    expr* name;
     expr* vars;
     expr* e;
 } JDef;
 expr* make_JDef(expr* f, expr* v, expr* e);
 
+typedef struct {
+
+    JDef* def;
+    expr* next;
+
+}Env;
+expr* make_Env(JDef* y, expr* z);
 
 typedef struct{
 

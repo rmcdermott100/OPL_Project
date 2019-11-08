@@ -4,7 +4,16 @@
 #include <string.h>
 #include "LL.h"
 
+Env* env;
 
+expr* make_Env(JDef* y, expr* z){
+
+    Env* p = (Env*)malloc(sizeof(Env));
+    p -> def = y;
+    p -> next = z;
+    return (Env*)p;
+
+}
 
 expr* make_JVar(char* v){
 
@@ -14,7 +23,7 @@ expr* make_JVar(char* v){
     return (expr*)v;
 }
 
-expr* make_Jfunc(char* f){
+expr* make_JFunc(char* f){
 
     JFunc* p = (JFunc*)malloc(sizeof(JFunc));
     p->head.tag = JDEF;
@@ -27,7 +36,7 @@ expr* make_JDef(expr *f, expr* v, expr* e){
 
     JDef * p = malloc(sizeof(JDef));
     p->head.tag = JDEF;
-    p->func = f;
+    p->name = f;
     p->vars = v;
     p->e = e;
     return (expr*)p;
@@ -193,20 +202,41 @@ void eval(expr* oc){
 
                             JCons * temp2 = (JCons *) ka -> vs;
 
-                            if(find_tag(temp2->left) == JDEF){
-                                //subs the vars in the def, and return the expression of the function?
-                                JDef * def = temp2 -> left;
+                            if(find_tag(temp2->left) == JFUNC){
+
+                                JFunc * jfunc = temp2 -> left;
+                                //make a define of the function name?
                                 JCons * vals = temp2 -> right;
-                                //while loop that repeats until one of the lists are empty?
-                                //should contain equal # of values and variables
+                                //find definition
+
+                                Env* temp_env = env;
+                                JDef* def = temp_env -> def;
+                                while(find_tag(temp_env) != JNULL){
+                                    if(!(strcmp(jfunc -> f, def -> name))){
+                                        def = temp_env -> def;
+                                    }else{
+                                        temp_env = temp_env -> next;
+                                    }
+                                }
+
+                                if(find_tag(temp_env) == JNULL){
+                                    printf("FAILURE, function name not found");
+                                    exit(1);
+                                }
+
                                 while(find_tag(vals) != JNULL){
                                     def -> e = subst(def->e, japp_return_first(def->vars), japp_return_first(vals));
                                     vals = japp_remove_first(vals);
                                     def->vars = japp_remove_first(def->vars);
                                 }
-                                // remake japp with just the expression?
+                                //Why infinte loop?
+                                // add the new JApp to Ka -> e?
+                                ka -> vs = vals;
+
+                                japp_push(&(ka->es), def -> e);
+                                ok = ka;
                                 // finish this part then it works?
-                                
+                                break;
 
                             }else{
 
@@ -226,7 +256,7 @@ void eval(expr* oc){
                         }else{
 
                             JCons* tmp = ka->es;
-                            pretty_printer(ka->es);
+
                             if (find_tag(tmp -> left) == JNUM){
 
                                 ka -> es = tmp -> right;
@@ -266,8 +296,9 @@ Prim find_prim(expr* app){
 bool j_false(expr* c){
 
     JIf *m = (JIf*) c;
-    JBool* boolean = (JBool*)m->c;
-    if(boolean -> b == true){
+    JNum * num = (JNum*) m;
+    //JBool* boolean = (JBool*)m;
+    if(num -> n > 0){
         return true;
     }else{
         return false;
@@ -341,6 +372,7 @@ void japp_push(expr** vs, expr* p){
     if (find_tag(*vs) == JNULL){
         tmp = make_JCons(l, x);
     }else{
+        
         tmp = make_JCons(l,*vs);
     }
     *vs = tmp;
@@ -493,7 +525,7 @@ expr* subst(expr* e, char* x, JNum *v){
             if (strcmp(temp->v, x)){
                 return e;
             }else{
-                return v;
+                return (JNum*)v;
             }
         }
         case JIF:{
@@ -527,17 +559,18 @@ expr* subst(expr* e, char* x, JNum *v){
 }
 
 void test(void){
-    /*
-    JCons* t = make_JCons(make_JNum(3), make_JNull());
-	JNum* l = make_JNum(7);
-    japp_push(&t, l);
-    Prim* tmp = make_JPrim(ADD);
-    japp_push(&t, tmp);
-    */
+
+    JFunc* Test = make_JFunc("Add1");
+    JVar* var = make_JVar("test");
+    JCons* var_list = make_JCons(var, make_JNull());
+    JApp * e = make_JApp(make_JPrim(ADD), make_JCons(var, make_JCons(make_JNum(1), make_JNull())));
+    JDef * def = make_JDef("Add1", var_list, e);
+    env = make_Env(def, make_JNull());
     JApp* q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));
+    JApp* func_test = make_JApp(make_JPrim(ADD), make_JCons(Test, make_JCons(make_JNum(0), make_JNull())));
     JApp* v = make_JApp(make_JPrim(ADD), make_JCons(q, make_JCons(make_JNum(3), make_JNull())));
 
-    eval(v);
+    eval(func_test);
 
 }
 
