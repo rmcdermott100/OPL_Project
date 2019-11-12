@@ -214,6 +214,7 @@ void eval(expr* oc){
                                 while(find_tag(temp_env) != JNULL){
                                     if(!(strcmp(jfunc -> f, def -> name))){
                                         def = temp_env -> def;
+                                        break;
                                     }else{
                                         temp_env = temp_env -> next;
                                     }
