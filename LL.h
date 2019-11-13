@@ -166,7 +166,7 @@ Prim find_prim(expr* app);
 expr* delta(expr* d);
 expr* subst(expr* e, char* x, JNum *v);
 void eval_state(expr* e, expr* k);
-
+void japp_add_end(expr** vs, expr* p);
 
 
 
