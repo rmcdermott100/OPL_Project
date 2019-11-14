@@ -20,7 +20,7 @@ expr* make_JVar(char* v){
     JVar* p = (JVar*)malloc(sizeof(JVar));
     p->head.tag = JVAR;
     p->v = v;
-    return (expr*)v;
+    return (expr*)p;
 }
 
 expr* make_JFunc(char* f){
@@ -201,9 +201,9 @@ void eval(expr* oc){
                         if(empty_list(ka->es)){
 
                             JCons * temp2 = (JCons *) ka -> vs;
-                            pretty_printer(temp2);
+
                             if(find_tag(temp2->left) == JFUNC){
-                                printf("found function");
+
                                 JFunc * jfunc = temp2 -> left;
                                 //make a define of the function name?
                                 JCons * vals = temp2 -> right;
@@ -211,10 +211,11 @@ void eval(expr* oc){
 
                                 Env* temp_env = env;
                                 JDef* def = temp_env -> def;
+
                                 //look in environment for the function definition
                                 while(find_tag(temp_env) != JNULL){
                                     if(!(strcmp(jfunc -> f, def -> name))){
-                                        printf("found function name");
+
                                         def = temp_env -> def;
                                         break;
                                     }else{
@@ -222,22 +223,24 @@ void eval(expr* oc){
                                     }
                                 }
 
-                                if(find_tag(temp_env) == JNULL){
-                                    printf("FAILURE, function name not found");
+                                if(find_tag(temp_env) == JNULL || temp_env == NULL){
+                                    printf("fail");
                                     exit(1);
                                 }
-
-                                while(find_tag(vals) != JNULL){
-                                    printf("substituting variables0");
-                                    def -> e = subst(def->e, japp_return_first(def->vars), japp_return_first(vals));
-                                    vals = japp_remove_first(vals);
-                                    def->vars = japp_remove_first(def->vars);
+                                JCons* vars = def -> vars;
+                                while(find_tag(vars) != JNULL){
+                                    printf("dying here\n");
+                                    pretty_printer(vars);
+                                    JVar * var = vars -> left;
+                                    def -> e = subst(def->e, var -> v, japp_return_first(vals));
+                                    vals = vals -> right;
+                                    vars = vars -> right;
+                                    pretty_printer(vars);
                                 }
-                                //Why infinte loop?
-                                // add the new JApp to Ka -> e?
+                                printf("here?");
                                 ka -> vs = vals;
 
-                                japp_push(&(ka->es), def -> e);
+                                japp_push(&ka->es, def -> e);
                                 ok = ka;
                                 // finish this part then it works?
                                 break;
@@ -250,7 +253,7 @@ void eval(expr* oc){
                                 oc = d;
 
                                 if(find_tag(ka -> k) == KAPP){
-                                    printf("dying here");
+
                                     KApp * m = (KApp*) ka ->k;
                                     japp_push(&m ->es, d);
                                 }
@@ -263,16 +266,17 @@ void eval(expr* oc){
                         }else{
 
                             JCons* tmp = ka->es;
-                            pretty_printer(tmp);
+
                             if (find_tag(tmp -> left) == JNUM || find_tag(tmp -> left) == JFUNC){
-                                printf("%d\n", find_tag(tmp->left));
+
                                 ka -> es = tmp -> right;
                                 oe = japp_return_first(tmp);
                                 tmp = japp_remove_first(tmp);
-                                japp_add_end(&vs, oe);
-                                ka -> vs = vs;
-                                ka -> es = tmp;
+                                vs = japp_add_end(vs, oe);
 
+                                ka -> vs = vs;
+
+                                ka -> es = tmp;
                                 break;
                             }else{
 
@@ -388,19 +392,21 @@ void japp_push(expr** vs, expr* p){
 
 }
 
-void japp_add_end(expr** vs, expr* p){
-    JCons* tmp = *vs;
+expr* japp_add_end(expr* vs, expr* p){
+    JCons* tmp = vs;
+    JCons* tmp2 = vs;
     JNull* x = make_JNull();
-    if (find_tag(*vs) == JNULL){
+    if (find_tag(vs) == JNULL){
         //printf("empty list");
         tmp = make_JCons(p, x);
     }else{
-        while(find_tag(tmp->right) != JNULL){
-            tmp = tmp -> right;
+        while(find_tag(tmp2->right) != JNULL){
+            tmp2 = tmp2 -> right;
         }
-        tmp -> right = make_JCons(p, x);
+        tmp2 -> right = make_JCons(p, x);
     }
-    *vs = tmp;
+
+    return tmp;
 }
 // Return first and remove first combined is pop function
 expr* japp_return_first(expr* vs){
@@ -440,7 +446,7 @@ void pretty_printer(expr* p){
         }
         case JNULL:{
             JNull* pp = (JNull*)p;
-            printf("NULL\n");
+            printf("JNULL\n");
             break;
         }
 		case JCONS:{
@@ -459,6 +465,16 @@ void pretty_printer(expr* p){
             pretty_printer(pp->func);
             printf("args = ");
             pretty_printer(pp->args);
+            break;
+        }
+        case JFUNC:{
+            JFunc* pp = (JFunc*) p;
+            printf("JFUNC %s\n", pp->f);
+            break;
+        }
+        case JVAR:{
+            JVar* pp = (JVar*)p;
+            printf("JVAR %s\n", pp->v);
             break;
         }
     }
@@ -545,11 +561,16 @@ expr* delta(expr* d){
 expr* subst(expr* e, char* x, JNum *v){
     //depending on the expression substitute differently
     switch(find_tag(e)){
+        case JNULL:{
+            return e;
+        }
         case JVAR:{
             JVar * temp = (JVar*) e;
             if (strcmp(temp->v, x)){
+
                 return e;
             }else{
+
                 return (JNum*)v;
             }
         }
@@ -560,14 +581,18 @@ expr* subst(expr* e, char* x, JNum *v){
             return l;
         }
         case JCONS:{
+
             JCons * temp = (JCons*) e;
-            temp = subst(temp -> left, x,v);
-            temp = subst(temp -> right, x,v);
+            temp -> left = subst(temp -> left, x,v);
+
+            temp -> right = subst(temp -> right, x,v);
             return temp;
         }
         case JAPP:{
             JApp* temp = (JApp*) e;
+
             temp->args = subst(temp->args, x,v);
+
             return temp;
         }
         case JDEF:{
@@ -592,8 +617,8 @@ void test(void){
     JDef * def = make_JDef("Add1", var_list, e);
     env = make_Env(def, make_JNull());
     JApp* q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));
-    JApp* func_test = make_JApp(make_JPrim(ADD), make_JCons(Test, make_JCons(make_JNum(1),
-    make_JCons( make_JNum(0), make_JNull()))));
+    JApp* func_test = make_JApp(make_JPrim(ADD), make_JCons(Test, make_JCons(make_JNum(0),
+    make_JCons( make_JNum(1), make_JNull()))));
     JApp* v = make_JApp(make_JPrim(ADD), make_JCons(q, make_JCons(make_JNum(3), make_JNull())));
 
     eval(func_test);
