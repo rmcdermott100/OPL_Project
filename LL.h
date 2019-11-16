@@ -15,7 +15,8 @@ typedef enum {
     JCONS,
     JVAR,
     JFUNC,
-    JDEF
+    JDEF,
+    LAMBDA
 } Tag ;
 
 typedef enum {
@@ -152,6 +153,15 @@ typedef struct {
 
 }KApp;
 expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
+
+typedef struct{
+
+    expr head;
+    expr* vars;
+    expr* e;
+
+}Lambda;
+expr* make_Lambda(expr* v, expr* e);
 
 void pretty_printer(expr* p);
 void free_list(expr* p);

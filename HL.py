@@ -11,6 +11,16 @@ class C(object):
 class E(object):
     None
 
+class Lambda(J1e):
+
+    vars = None
+    e = None
+
+    def __init__(self, v, e):
+        self.vars = v
+        self.e = e
+
+
 class JVar(J1e): # start with lowercase letter
     var = None # name of functions
 
@@ -54,8 +64,7 @@ class JNull(J1e):
 
     def pp(self):
         return "NULL"
-    def interp(self):
-        return 0
+
     def subst(self,x,v):
         return
 
@@ -71,9 +80,6 @@ class JCons(J1e):
     def pp(self):
         return "(" + self.left.pp() + self.right.pp() + ")"
 
-    def interp(self):
-        return JCons(self.left.interp(), self.right.interp())
-
     def subst(self,x,v):
         self.left.subst(x,v)
         self.right.subst(x,v)
@@ -87,9 +93,6 @@ class JPrim(J1e):
     def pp(self):
         return ""+self.p
 
-    def interp(self):
-        return self.p
-
     def subst(self,x,v):
         None
 
@@ -101,9 +104,6 @@ class JBool(J1e):
 
     def pp(self):
         return ""+self.b
-
-    def interp(self):
-        return self.b
 
     def subst(self,x,v):
         None
@@ -121,13 +121,6 @@ class JIf(J1e):
     def pp(self):
         return "if" + self.cond.pp() + self.tbr.pp() + self.fbr.pp()
 
-    def interp(self):
-        condv = self.cond.interp()
-        if type(condv) is JBool and condv.b == False:
-            return self.fbr.interp()
-        else:
-            return self.tbr.interp()
-
     def subst(self,x,v):
         self.cond.subst(x,v)
         self.tbr.subst(x,v)
@@ -144,40 +137,6 @@ class JApp(J1e):
 
     def pp(self):
         return "@" + self.fun.pp() + self.args.pp()
-
-    def interp(self):
-
-        which_fun = self.fun
-        arg_vals = self.args.interp()
-
-        if type(which_fun) is JPrim:
-            p = which_fun.interp()
-        else:
-            print("error in JApp interp, fun p = " + which_fun)
-            exit(1)
-
-        lhs = arg_vals.left
-        rhs = arg_vals.right.left
-        if p == "+":
-            return JNum(lhs + rhs)
-        if p == "*":
-            return JNum(lhs * rhs)
-        if p == "/":
-            return JNum(lhs / rhs)
-        if p == "-":
-            return JNum(lhs - rhs)
-        if p == "<":
-            return JBool(lhs < rhs)
-        if p == ">":
-            return JBool(lhs > rhs)
-        if p == "<=":
-            return JBool(lhs <= rhs)
-        if p == ">=":
-            return JBool(lhs >= rhs)
-        if p == "==":
-            return JBool(lhs == rhs)
-        if p == "!=":
-            return JBool(lhs != rhs)
 
     def subst(self,x,v):
         self.args.subst(x,v)

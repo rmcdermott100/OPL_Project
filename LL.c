@@ -141,6 +141,16 @@ expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k){
 
 }
 
+expr* make_Lambda(expr* v, expr* e){
+
+    Lambda * p = (Lambda*)mslloc(sizeof(Lambda));
+    p ->head = LAMBDA;
+    p->vars = v;
+    p->e = e;
+    return (expr*)p;
+
+}
+
 
 void eval(expr* oc){
     expr* oe = make_JNull();
