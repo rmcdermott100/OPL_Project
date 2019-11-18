@@ -32,8 +32,8 @@
 (LL) Make a tweak to the CEK0 machine to give it dynamic scope, commit that, then revert it.(COMPLETED)
 (HL) Remove your big-step interpreter from the HL.(COMPLETED)
 (HL & LL) Define data structures to represent J3 programs and runtime values.(COMPLETED)
-(HL) Write a test-suite of a dozen J3 programs.
-(HL) Extend desugar to support let expressions.
+(HL) Write a test-suite of a dozen J3 programs. (COMPLETED)
+(HL) Extend desugar to support let expressions. (COMLPETED)
 (LL) Extend CEK0 to CEK1 to evaluate J3 programs.
 (HL) Write a test program that evaluates factorial using only functions, except for a final conversion to numbers.
 (HL & LL) Extend your J3 data structures to J4.

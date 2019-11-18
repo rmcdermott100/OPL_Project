@@ -327,6 +327,14 @@ def desug(se):
         type(se.right.right.right) is Sep and \
         se.right.right.right.right == None:
         return JIf(desug(se.right.left), desug(se.right.right.left), desug(se.right.right.right.left))
+
+    if type(se)is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "let" and \
+        type(se.right) is Sep and\
+        type (se.right.right) is Sep and \
+        type(se.right.right.right.right.right) is Sep:
+        return JCons(Lambda(se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
     #if got down to here its bad news
     return JNum(666)
 
@@ -351,6 +359,7 @@ def isNull(se):
 
 
 def test():
+
     None
 
 
