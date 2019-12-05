@@ -211,7 +211,7 @@ void eval(expr* oc){
                         if(empty_list(ka->es)){
 
                             JCons * temp2 = (JCons *) ka -> vs;
-
+                            //change this to a lambda
                             if(find_tag(temp2->left) == JFUNC){
 
                                 JFunc * jfunc = temp2 -> left;
