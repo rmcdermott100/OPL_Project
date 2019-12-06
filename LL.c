@@ -143,10 +143,20 @@ expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k){
 
 expr* make_Lambda(expr* v, expr* e){
 
-    Lambda * p = (Lambda*)mslloc(sizeof(Lambda));
-    p ->head = LAMBDA;
+    Lambda * p = (Lambda*)malloc(sizeof(Lambda));
+    p ->head.tag = LAMBDA;
     p->vars = v;
     p->e = e;
+    return (expr*)p;
+
+}
+
+expr* make_Closure(expr* l, expr* env){
+
+    Closure * p = (Closure*)malloc(sizeof(Closure));
+    p -> head.tag = CLOSURE;
+    p -> lam = l;
+    p -> env = env;
     return (expr*)p;
 
 }
@@ -178,9 +188,7 @@ void eval(expr* oc){
                 break;
                 }
             //values we switch onto what the continuation is
-            case JCONS:{
 
-            }
             case JNUM:
             case JPRIM:
             case JBOOL:
@@ -211,18 +219,19 @@ void eval(expr* oc){
                         if(empty_list(ka->es)){
 
                             JCons * temp2 = (JCons *) ka -> vs;
-                            //change this to a lambda
-                            if(find_tag(temp2->left) == JFUNC){
 
-                                JFunc * jfunc = temp2 -> left;
+                            if(find_tag(temp2->left) == LAMBDA){
+
+                                Lambda * lam = temp2 -> left;
                                 //make a define of the function name?
                                 JCons * vals = temp2 -> right;
                                 //find definition
 
                                 Env* temp_env = env;
-                                JDef* def = temp_env -> def;
+                                //JDef* def = lam -> e;
 
                                 //look in environment for the function definition
+                                /*
                                 while(find_tag(temp_env) != JNULL){
                                     if(!(strcmp(jfunc -> f, def -> name))){
 
@@ -232,25 +241,26 @@ void eval(expr* oc){
                                         temp_env = temp_env -> next;
                                     }
                                 }
-
+                                */
+                                //def = lam -> e;
                                 if(find_tag(temp_env) == JNULL || temp_env == NULL){
                                     printf("fail");
                                     exit(1);
                                 }
-                                JCons* vars = def -> vars;
+                                JCons* vars = lam -> vars;
                                 while(find_tag(vars) != JNULL){
-                                    printf("dying here\n");
-                                    pretty_printer(vars);
+
+
                                     JVar * var = vars -> left;
-                                    def -> e = subst(def->e, var -> v, japp_return_first(vals));
+                                    lam -> e = subst(lam->e, var -> v, japp_return_first(vals));
                                     vals = vals -> right;
                                     vars = vars -> right;
-                                    pretty_printer(vars);
+
                                 }
-                                printf("here?");
+
                                 ka -> vs = vals;
 
-                                japp_push(&ka->es, def -> e);
+                                japp_push(&ka->es, lam -> e);
                                 ok = ka;
                                 // finish this part then it works?
                                 break;
@@ -277,7 +287,7 @@ void eval(expr* oc){
 
                             JCons* tmp = ka->es;
 
-                            if (find_tag(tmp -> left) == JNUM || find_tag(tmp -> left) == JFUNC){
+                            if (find_tag(tmp -> left) == JNUM || find_tag(tmp -> left) == LAMBDA){
 
                                 ka -> es = tmp -> right;
                                 oe = japp_return_first(tmp);
@@ -621,15 +631,21 @@ expr* subst(expr* e, char* x, JNum *v){
 void test(void){
 
     JFunc* Test = make_JFunc("Add1");
+
     JVar* var = make_JVar("test");
     JCons* var_list = make_JCons(var, make_JNull());
     JApp * e = make_JApp(make_JPrim(ADD), make_JCons(var, make_JCons(make_JNum(1), make_JNull())));
+    Lambda * l1 = make_Lambda(var_list, e);
     JDef * def = make_JDef("Add1", var_list, e);
     env = make_Env(def, make_JNull());
     JApp* q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));
-    JApp* func_test = make_JApp(make_JPrim(ADD), make_JCons(Test, make_JCons(make_JNum(0),
+    JApp* func_test = make_JApp(make_JPrim(ADD), make_JCons(l1, make_JCons(make_JNum(0),
     make_JCons( make_JNum(1), make_JNull()))));
     JApp* v = make_JApp(make_JPrim(ADD), make_JCons(q, make_JCons(make_JNum(3), make_JNull())));
+
+    // test cek on lambdas
+    //Lambda * l1 = make_Lambda(var, e);
+
 
     eval(func_test);
 

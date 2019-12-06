@@ -16,8 +16,9 @@ typedef enum {
     JVAR,
     JFUNC,
     JDEF,
-    LAMBDA
-} Tag ;
+    LAMBDA,
+    CLOSURE
+} Tag;
 
 typedef enum {
     ADD,
@@ -162,6 +163,15 @@ typedef struct{
 
 }Lambda;
 expr* make_Lambda(expr* v, expr* e);
+
+typedef struct{
+
+    expr head;
+    Lambda* lam;
+    expr* env;
+
+}Closure;
+expr* make_Closure(expr* l, expr* env);
 
 void pretty_printer(expr* p);
 void free_list(expr* p);
