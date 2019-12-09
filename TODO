@@ -40,7 +40,7 @@
 (HL) Extend desugar to allow not mentioning the recursive name, as well as provide a default.
 (HL) Write a dozen test J3 programs, including extensions to your standard library.
 (LL) Extend the CEK1 machine to CEK2 to evaluate J4.
-(HL) Extend your J4 data structures to J5.
+(HL) Extend your J4 data structures to J5. (COMPLETED?)
 (HL) Write a dozen test programs in J5 using the raw extensions.
 (HL) Extend your standard library to include options and basic list functions, like map, filter, and fold.
 (HL) Write a dozen test J5 programs that use the standard library.(finish here)

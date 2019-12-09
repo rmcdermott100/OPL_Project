@@ -157,6 +157,23 @@ class JNum(J1e):
     def subst(self,x,v):
         None
 
+
+class case:
+    None
+
+class unit:
+    None
+
+class pair:
+    left = None
+    right = None
+
+class inl:
+    value = None
+
+class inr:
+    value = None
+
 class Se(object):
     None
 
@@ -383,12 +400,16 @@ def emit_LL():
     f.write("#include <stdio.h> \n")
     f.write("#include \"LL.h\"\n\n")
     f.write("int main(int argc, char * argv[]) {\n")
-    f.write("\tJNum* g1 = make_JNum(5);\n")
-    f.write("\tJCons* g2 = make_JCons(make_JNum(3), make_JNull());\n")
-    f.write("\tjapp_push(&g2, g1);\n")
-    f.write("\tJPrim* g3 = make_JPrim(ADD);\n")
-    f.write("\tJApp *g4 = make_JApp(g3, g2);\n")
-    f.write("\teval(g4);\n")
+    f.write("JVar * var = make_JVar(\"test\");\n")
+    f.write("JCons * var_list = make_JCons(var, make_JNull());\n")
+    f.write("JApp * e = make_JApp(make_JPrim(ADD), make_JCons(var, make_JCons(make_JNum(1), make_JNull())));\n")
+    f.write("Lambda * l1 = make_Lambda(\"hello\", var_list, e);\n")
+    f.write("JDef *def = make_JDef(\"Add1\", var_list, e);\n")
+    f.write("JApp * q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));\n")
+    f.write("JApp * func_test = make_JApp(make_JPrim(ADD), make_JCons(l1, make_JCons(make_JNum(0),make_JCons(make_JNum(1), make_JNull()))));\n")
+    f.write("JApp * v = make_JApp(make_JPrim(ADD), make_JCons(q, make_JCons(make_JNum(3), make_JNull())));\n")
+
+    f.write("\teval(func_test);\n")
     f.write("\treturn 0;\n")
     f.write("}")
     f.close()
@@ -399,8 +420,8 @@ def emit_LL():
 
 
 if __name__ == "__main__":
-    test()
-    #emit_LL()
+    #test()
+    emit_LL()
 
 
 
