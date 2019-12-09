@@ -18,7 +18,7 @@ class Lambda(J1e):
     name = None
 
     def __init__(self, n, v, e):
-        self.name = n;
+        self.name = n
         self.vars = v
         self.e = e
 
@@ -336,7 +336,19 @@ def desug(se):
         type(se.right) is Sep and\
         type (se.right.right) is Sep and \
         type(se.right.right.right.right.right) is Sep:
-        return JCons(Lambda(se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
+        return JCons(Lambda(se.right.left.s, se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
+
+    if type(se)is Sep and \
+        type(se.left) is Sestr and \
+        se.left.s == "let" and \
+        type(se.right) is Sep and\
+        type(se.right.left) is Sestr and \
+        se.right.left.s == "rec" and \
+        type (se.right.right) is Sep and \
+        type(se.right.right.right.right.right) is Sep:
+        return JCons(Lambda("rec", se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
+
+
     #if got down to here its bad news
     return JNum(666)
 
