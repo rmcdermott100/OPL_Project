@@ -158,11 +158,12 @@ expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k);
 typedef struct{
 
     expr head;
+    char * name;
     expr* vars;
     expr* e;
 
 }Lambda;
-expr* make_Lambda(expr* v, expr* e);
+expr* make_Lambda(char* name, expr* v, expr* e);
 
 typedef struct{
 

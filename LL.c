@@ -141,10 +141,11 @@ expr* make_KApp(expr* rator, expr* vs, expr* es, expr* k){
 
 }
 
-expr* make_Lambda(expr* v, expr* e){
+expr* make_Lambda(char* name, expr* v, expr* e){
 
     Lambda * p = (Lambda*)malloc(sizeof(Lambda));
     p ->head.tag = LAMBDA;
+    p->name = name;
     p->vars = v;
     p->e = e;
     return (expr*)p;
@@ -192,7 +193,7 @@ void eval(expr* oc){
             case JNUM:
             case JPRIM:
             case JBOOL:
-            case JVAR://?
+            case JVAR:
             case JNULL:{
                 switch(find_tag(ok)){
                     case KRET:{
@@ -635,7 +636,7 @@ void test(void){
     JVar* var = make_JVar("test");
     JCons* var_list = make_JCons(var, make_JNull());
     JApp * e = make_JApp(make_JPrim(ADD), make_JCons(var, make_JCons(make_JNum(1), make_JNull())));
-    Lambda * l1 = make_Lambda(var_list, e);
+    Lambda * l1 = make_Lambda("hello", var_list, e);
     JDef * def = make_JDef("Add1", var_list, e);
     env = make_Env(def, make_JNull());
     JApp* q = make_JApp(make_JPrim(ADD), make_JCons(make_JNum(3), make_JCons(make_JNum(7), make_JNull())));

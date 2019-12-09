@@ -15,8 +15,10 @@ class Lambda(J1e):
 
     vars = None
     e = None
+    name = None
 
-    def __init__(self, v, e):
+    def __init__(self, n, v, e):
+        self.name = n;
         self.vars = v
         self.e = e
 
