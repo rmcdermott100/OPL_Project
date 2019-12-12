@@ -159,20 +159,32 @@ class JNum(J1e):
 
 
 class case:
+    #? what is this
     None
 
 class unit:
+    #? what is this?
     None
 
 class pair:
     left = None
     right = None
 
+    def __init__(self, l, r):
+        self.left = l
+        self.right = r
+
 class inl:
     value = None
 
+    def __init__(self, v):
+        self.value=v
+
 class inr:
     value = None
+
+    def __init__(self, v):
+        self.value=v
 
 class Se(object):
     None
@@ -389,9 +401,9 @@ def isNull(se):
 
 
 
-def test():
-    #make tests to turn into low level? then emit it?
-    None
+def J5test():
+    # desugar J5 classes, because the HL isnt connected to the LL
+    pair
 
 
 
