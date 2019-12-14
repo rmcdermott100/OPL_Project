@@ -363,7 +363,7 @@ def desug(se):
         type(se.left) is Sestr and \
         se.left.s == "let" and \
         type(se.right) is Sep and\
-        type (se.right.right) is Sep and \
+        type(se.right.right) is Sep and \
         type(se.right.right.right.right.right) is Sep:
         return JCons(Lambda(se.right.left.s, se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
 
@@ -373,7 +373,7 @@ def desug(se):
         type(se.right) is Sep and\
         type(se.right.left) is Sestr and \
         se.right.left.s == "rec" and \
-        type (se.right.right) is Sep and \
+        type(se.right.right) is Sep and \
         type(se.right.right.right.right.right) is Sep:
         return JCons(Lambda("rec", se.right.left, se.right.right.right.right.right.left),JCons(se.right.right.right.left,JNull()))
 
@@ -403,7 +403,7 @@ def isNull(se):
 
 def J5test():
     # desugar J5 classes, because the HL isnt connected to the LL
-    pair
+    None
 
 
 
