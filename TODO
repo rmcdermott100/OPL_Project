@@ -41,9 +41,9 @@
 (HL) Write a dozen test J3 programs, including extensions to your standard library.(COMPLETED)
 (LL) Extend the CEK1 machine to CEK2 to evaluate J4.(COMPLETED?)
 (HL) Extend your J4 data structures to J5. (COMPLETED?)
-(HL) Write a dozen test programs in J5 using the raw extensions.
-(HL) Extend your standard library to include options and basic list functions, like map, filter, and fold.
-(HL) Write a dozen test J5 programs that use the standard library.(finish here?)
+(HL) Write a dozen test programs in J5 using the raw extensions. (COMPLETED)
+(HL) Extend your standard library to include options and basic list functions, like map, filter, and fold. (COMPLETED)
+(HL) Write a dozen test J5 programs that use the standard library.(finish here?) (COMPLETED)
 (LL) Extend your J4 data structures to J5 and extend the CEK2 machine to CEK3 to evaluate J5.
 (HL) Extend your data structures to represent J6 programs.
 (HL) Extend your desugar standard library with mutation helpers.

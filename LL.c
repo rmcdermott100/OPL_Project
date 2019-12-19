@@ -210,7 +210,7 @@ void eval(expr* oc){
                     }
 
                     case KAPP:{
-                        #=// how if J4 different from J3?? only the name??
+                        // how if J4 different from J3?? only the name??
                         KApp* ka = (KApp*) ok;
                         expr* ratorp = ka -> rator;
                         expr* vs = ka -> vs;

@@ -402,7 +402,8 @@ def isNull(se):
 
 
 def J5test():
-    # desugar J5 classes, because the HL isnt connected to the LL
+    # desugar J3 classes, because the HL isnt connected to the LL and print them out to write the tests??
+
     None
 
 
